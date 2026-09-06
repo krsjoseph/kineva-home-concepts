@@ -168,7 +168,7 @@
 
   /* expanded mode: phones grow to their full content */
   body.expanded .phone { height: auto; }
-  body.expanded .phone .scroll { position: static; overflow: visible; padding-bottom: 8px; }
+  body.expanded .phone .scroll { position: relative; inset: auto; z-index: 2; overflow: visible; padding-bottom: 8px; }
   body.expanded .phone .tabbar { position: relative; left: auto; right: auto; bottom: auto; margin: 4px 16px 10px; }
   body.expanded .phone .home-ind { position: relative; left: auto; bottom: auto; transform: none; margin: 0 auto 12px; }
   .toggle { margin-left: auto; cursor: pointer; border-color: var(--mint) !important; color: var(--mint) !important; }
