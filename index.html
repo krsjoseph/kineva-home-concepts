@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kineva — Home screen concepts</title>
+<style>
+  :root {
+    --canvas: #0f1014;
+    --surface: #1d1e23;
+    --surface-2: #2a2c34;
+    --ink: #f7f7fa;
+    --ink-2: #c3c4ca;
+    --ink-3: #7d7f88;
+    --hair: rgba(255,255,255,.12);
+    --hair-strong: rgba(255,255,255,.22);
+    --mint: #69ddb8;
+    --mint-glow: #54e6bd;
+    --charge: #03e095;
+    --effort: #f0a85a;
+    --rest: #8e6fd6;
+    --cyan: #5bc8e8;
+    --rose: #ff6b81;
+    --amber: #f2c53d;
+    --sleep-1: #dbe6f7;
+    --sleep-2: #8fb6ec;
+    --sleep-3: #4f86d6;
+    --sleep-4: #2a4c8f;
+    --radius: 26px;
+    --font: -apple-system, "SF Pro Text", "SF Pro Display", Inter, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+  a { color: var(--mint); }
+  .page { max-width: 1240px; margin: 0 auto; padding: 48px 24px 120px; }
+  .page h1 { font-size: 34px; letter-spacing: -.02em; margin: 0 0 8px; }
+  .page .lede { color: var(--ink-2); max-width: 760px; line-height: 1.5; font-size: 16px; margin: 0 0 12px; }
+  .page .meta { color: var(--ink-3); font-size: 13px; margin-bottom: 36px; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 56px; }
+  .toc a { text-decoration: none; color: var(--ink-2); font-size: 13px; padding: 8px 12px; border: 1px solid var(--hair); border-radius: 999px; background: rgba(255,255,255,.03); }
+  .toc a:hover { border-color: var(--hair-strong); color: var(--ink); }
+  .concept { display: grid; grid-template-columns: 420px 1fr; gap: 40px; align-items: start; padding: 48px 0; border-top: 1px solid var(--hair); }
+  .concept .notes h2 { font-size: 24px; margin: 4px 0 4px; letter-spacing: -.01em; }
+  .concept .notes .tag { display: inline-block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mint); margin-bottom: 8px; }
+  .concept .notes p { color: var(--ink-2); line-height: 1.55; font-size: 15px; }
+  .concept .notes h3 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin: 22px 0 8px; }
+  .concept .notes ul { margin: 0; padding-left: 18px; color: var(--ink-2); line-height: 1.55; font-size: 14px; }
+  .concept .notes li { margin-bottom: 4px; }
+  .concept .notes .refs a { display: block; font-size: 13px; margin-bottom: 4px; }
+  @media (max-width: 900px) { .concept { grid-template-columns: 1fr; } .phone { margin: 0 auto; } }
+
+  /* ---------- phone frame ---------- */
+  .phone { width: 393px; height: 852px; border-radius: 54px; position: relative; overflow: hidden; background: #000; box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 10px #17181c, 0 0 0 12px #2a2c34; isolation: isolate; }
+  .phone .bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+  .phone .bg .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; mix-blend-mode: screen; animation: drift 18s ease-in-out infinite alternate; }
+  @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(18px,-26px) scale(1.12); } }
+  .phone .bg .grain { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.035) 1px, transparent 1px); background-size: 3px 3px; opacity: .5; }
+  .phone .status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 30px 6px; font-size: 15px; font-weight: 600; z-index: 5; }
+  .phone .island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 122px; height: 36px; border-radius: 20px; background: #000; z-index: 6; }
+  .phone .scroll { position: absolute; inset: 0; padding: 66px 16px 110px; overflow-y: auto; z-index: 2; scrollbar-width: none; }
+  .phone .scroll::-webkit-scrollbar { display: none; }
+  .phone .tabbar { position: absolute; left: 16px; right: 16px; bottom: 22px; height: 64px; border-radius: 34px; display: grid; grid-template-columns: repeat(5,1fr); align-items: center; z-index: 4; }
+  .tabbar .tab { text-align: center; font-size: 10px; color: var(--ink-2); display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .tabbar .tab svg { width: 22px; height: 22px; }
+  .tabbar .tab.on { color: var(--mint); }
+  .tabbar .tab.on .pill { position: absolute; }
+  .home-ind { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.55); z-index: 5; }
+
+  /* ---------- glass ---------- */
+  .glass { background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.035) 45%, rgba(255,255,255,.06)); backdrop-filter: blur(28px) saturate(170%); -webkit-backdrop-filter: blur(28px) saturate(170%); border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.25), 0 12px 32px rgba(0,0,0,.35); position: relative; }
+  .glass::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(120% 60% at 20% 0%, rgba(255,255,255,.14), transparent 60%); pointer-events: none; }
+  .glass.deep { background: linear-gradient(160deg, rgba(13,14,20,.72), rgba(13,14,20,.55)); }
+  .glass.pill { border-radius: 999px; }
+  .glass.tint-charge { box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 12px 40px rgba(3,224,149,.18); }
+  .glass.tint-effort { box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 12px 40px rgba(240,168,90,.18); }
+  .glass.tint-rest { box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 12px 40px rgba(142,111,214,.22); }
+
+  /* ---------- type ---------- */
+  .h-title { font-size: 34px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+  .h-sub { font-size: 13px; color: var(--ink-2); margin-top: 6px; }
+  .overline { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+  .num { font-variant-numeric: tabular-nums; font-weight: 700; letter-spacing: -.02em; }
+  .muted { color: var(--ink-3); }
+  .sec { color: var(--ink-2); }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .between { justify-content: space-between; }
+  .col { display: flex; flex-direction: column; }
+  .gap6 { gap: 6px; } .gap10 { gap: 10px; } .gap14 { gap: 14px; }
+  .mt10 { margin-top: 10px; } .mt14 { margin-top: 14px; } .mt18 { margin-top: 18px; } .mt24 { margin-top: 24px; }
+  .chev { color: var(--ink-3); font-size: 16px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#f0a85a,#8e6fd6); border: 2px solid rgba(255,255,255,.35); }
+  .iconbtn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 20px; color: var(--ink); }
+  .badge { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--hair); color: var(--ink-2); }
+  .delta-up { color: var(--charge); } .delta-down { color: var(--rose); } .delta-flat { color: var(--ink-3); }
+
+  /* rings */
+  .ring { position: relative; display: grid; place-items: center; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .track { stroke: rgba(255,255,255,.10); }
+  .ring .arc { stroke-linecap: round; filter: drop-shadow(0 0 6px currentColor); }
+  .ring .v { position: absolute; text-align: center; }
+  .ring .v .big { font-size: 28px; font-weight: 700; letter-spacing: -.03em; }
+  .ring .v .lbl { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); margin-top: -2px; }
+
+  /* sparkline */
+  .spark { width: 100%; height: 34px; display: block; }
+  .spark path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .spark .base { stroke: rgba(255,255,255,.12); stroke-dasharray: 2 4; }
+  .spark .area { fill: currentColor; opacity: .12; stroke: none; }
+
+  /* hypnogram (single-hue depth ramp) */
+  .hyp { display: flex; gap: 2px; align-items: flex-end; height: 44px; }
+  .hyp i { flex: 1; border-radius: 3px 3px 0 0; display: block; }
+  .hyp .a { background: var(--sleep-1); height: 18%; }
+  .hyp .l { background: var(--sleep-2); height: 45%; }
+  .hyp .r { background: var(--sleep-2); height: 45%; background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.35) 0 2px, transparent 2px 5px); }
+  .hyp .d { background: var(--sleep-3); height: 100%; }
+  .legend { display: flex; gap: 12px; font-size: 10px; color: var(--ink-2); flex-wrap: wrap; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; vertical-align: -1px; margin-right: 4px; }
+
+  /* grids */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .tile { padding: 14px 14px 12px; }
+  .tile .lbl { font-size: 11px; color: var(--ink-2); letter-spacing: .04em; }
+  .tile .val { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-top: 6px; line-height: 1; }
+  .tile .val small { font-size: 12px; font-weight: 500; color: var(--ink-2); margin-left: 3px; letter-spacing: 0; }
+  .tile .sub { font-size: 11px; margin-top: 6px; }
+
+  /* CTA */
+  .cta { height: 54px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 15px; color: #0b1512; background: linear-gradient(180deg, #8ff0d0, var(--mint)); box-shadow: 0 8px 24px rgba(84,230,189,.28), inset 0 1px 0 rgba(255,255,255,.6); }
+
+  /* bento */
+  .bento { display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 118px; gap: 10px; }
+  .bento .w2 { grid-column: span 2; } .bento .h2 { grid-row: span 2; }
+
+  /* ledger rows */
+  .lrow { display: grid; grid-template-columns: 34px 1fr 74px 80px; align-items: center; gap: 10px; padding: 12px 14px; border-top: 1px solid rgba(255,255,255,.08); }
+  .lrow:first-child { border-top: 0; }
+  .lrow .ic { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; font-size: 15px; background: rgba(255,255,255,.08); }
+  .lrow .n { font-size: 14px; font-weight: 600; }
+  .lrow .b { font-size: 11px; color: var(--ink-3); }
+  .lrow .v { font-size: 18px; font-weight: 700; text-align: right; letter-spacing: -.02em; }
+  .lrow .v small { font-size: 11px; color: var(--ink-2); font-weight: 500; }
+
+  /* timeline */
+  .tl { position: relative; padding-left: 26px; }
+  .tl::before { content: ""; position: absolute; left: 9px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--rest), var(--effort), var(--rose)); border-radius: 2px; opacity: .8; }
+  .tl .ev { position: relative; padding: 12px 14px; margin-bottom: 10px; }
+  .tl .ev::before { content: ""; position: absolute; left: -22px; top: 18px; width: 10px; height: 10px; border-radius: 50%; background: var(--c, var(--mint)); box-shadow: 0 0 0 4px rgba(0,0,0,.35), 0 0 10px var(--c, var(--mint)); }
+  .tl .t { font-size: 11px; color: var(--ink-3); }
+  .tl .h { font-size: 15px; font-weight: 600; margin-top: 2px; }
+  .tl .d { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+
+  /* segmented */
+  .seg { display: flex; padding: 3px; gap: 2px; }
+  .seg span { flex: 1; text-align: center; font-size: 12px; padding: 7px 0; border-radius: 999px; color: var(--ink-2); }
+  .seg span.on { background: rgba(255,255,255,.14); color: var(--ink); font-weight: 600; }
+
+  /* zone bar */
+  .zones { display: flex; gap: 2px; height: 10px; border-radius: 6px; overflow: hidden; }
+  .zones i { display: block; height: 100%; }
+
+  /* energy bar */
+  .bar { height: 8px; border-radius: 6px; background: rgba(255,255,255,.10); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--mint), #a8f2dc); box-shadow: 0 0 10px rgba(84,230,189,.5); }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Kineva — Home screen concepts</h1>
+  <p class="lede">Six directions for the Today tab. Each keeps a Liquid Glass material system (translucent slabs, specular top edge, saturated blur) but drops the day-cycle scenic illustration in favour of an abstract, slowly drifting colour field that takes its hue from the wearer's state. All numbers are test data for one wearer on Sunday 6 September.</p>
+  <p class="meta">Scores use the app's own tokens (Charge green, Effort amber, Rest violet, mint accent). Sleep depth is drawn as a single-hue ramp with a legend so it survives colour-vision deficiency. References were pulled from Mobbin and are linked under each concept.</p>
+  <div class="toc">
+    <a href="#c1">1 · Prism</a><a href="#c2">2 · Halo</a><a href="#c3">3 · Stack</a><a href="#c4">4 · Ledger</a><a href="#c5">5 · Focus</a><a href="#c6">6 · Bento</a>
+  </div>
+
+  <!-- =========================== 1 · PRISM =========================== -->
+  <section class="concept" id="c1">
+    <div class="phone">
+      <div class="bg" style="background: radial-gradient(120% 80% at 50% -10%, #12302a 0%, #0f1014 60%);">
+        <div class="blob" style="width:320px;height:320px;left:-80px;top:-60px;background:#03e095;"></div>
+        <div class="blob" style="width:260px;height:260px;right:-90px;top:120px;background:#2f6fcb;animation-delay:-6s;"></div>
+        <div class="blob" style="width:300px;height:300px;left:60px;bottom:-120px;background:#8e6fd6;opacity:.35;animation-delay:-11s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-title">Today</div><div class="h-sub">Sunday, 6 September</div></div>
+          <div class="row gap6"><div class="glass pill iconbtn">＋</div><div class="avatar"></div></div>
+        </div>
+
+        <div class="glass mt18" style="padding:20px 16px 16px;">
+          <div class="g3" style="gap:6px;">
+            <div class="ring" style="color:var(--charge)"><svg width="104" height="104" viewBox="0 0 104 104"><circle class="track" cx="52" cy="52" r="44" fill="none" stroke-width="9"/><circle class="arc" cx="52" cy="52" r="44" fill="none" stroke="currentColor" stroke-width="9" stroke-dasharray="276.5" stroke-dashoffset="16.6"/></svg><div class="v"><div class="big">94</div><div class="lbl">Charge</div></div></div>
+            <div class="ring" style="color:var(--effort)"><svg width="104" height="104" viewBox="0 0 104 104"><circle class="track" cx="52" cy="52" r="44" fill="none" stroke-width="9"/><circle class="arc" cx="52" cy="52" r="44" fill="none" stroke="currentColor" stroke-width="9" stroke-dasharray="276.5" stroke-dashoffset="119"/></svg><div class="v"><div class="big">11.4</div><div class="lbl">Effort</div></div></div>
+            <div class="ring" style="color:var(--rest)"><svg width="104" height="104" viewBox="0 0 104 104"><circle class="track" cx="52" cy="52" r="44" fill="none" stroke-width="9"/><circle class="arc" cx="52" cy="52" r="44" fill="none" stroke="currentColor" stroke-width="9" stroke-dasharray="276.5" stroke-dashoffset="33"/></svg><div class="v"><div class="big">88</div><div class="lbl">Rest</div></div></div>
+          </div>
+          <div class="mt14" style="font-size:14px;line-height:1.45;color:var(--ink);">Recovered and rested. HRV is <b>7% above</b> your 30-day baseline; a hard session today lands you at <b>14–16</b> effort.</div>
+          <div class="row between mt10"><span class="badge">WHOOP · synced 4 min ago</span><span class="chev">›</span></div>
+        </div>
+
+        <div class="glass mt10" style="padding:14px 16px;">
+          <div class="row between"><div class="row gap10"><span style="color:var(--mint)">⚡</span><b style="font-size:14px">Energy</b></div><span class="num" style="font-size:14px">64%</span></div>
+          <div class="bar mt10"><i style="width:64%"></i></div>
+          <div class="row between mt10" style="font-size:11px;color:var(--ink-3)"><span>Drains ~10:40 PM at this pace</span><span>Peak 2–5 PM</span></div>
+        </div>
+
+        <div class="overline mt24">Key metrics</div>
+        <div class="g2 mt10">
+          <div class="glass tile" style="color:var(--cyan)"><div class="lbl">HRV</div><div class="val" style="color:var(--ink)">62<small>ms</small></div><div class="sub delta-up">▲ 4 vs baseline 58</div><svg class="spark mt10" viewBox="0 0 100 34"><path class="base" d="M0 20H100"/><path class="area" d="M0 22 L14 20 L28 24 L42 18 L56 21 L70 14 L84 16 L100 10 V34 H0Z"/><path stroke="currentColor" d="M0 22 L14 20 L28 24 L42 18 L56 21 L70 14 L84 16 L100 10"/></svg></div>
+          <div class="glass tile" style="color:var(--rose)"><div class="lbl">Resting HR</div><div class="val" style="color:var(--ink)">49<small>bpm</small></div><div class="sub delta-up">▼ 2 vs baseline 51</div><svg class="spark mt10" viewBox="0 0 100 34"><path class="base" d="M0 16H100"/><path class="area" d="M0 12 L14 14 L28 10 L42 15 L56 13 L70 18 L84 20 L100 22 V34 H0Z"/><path stroke="currentColor" d="M0 12 L14 14 L28 10 L42 15 L56 13 L70 18 L84 20 L100 22"/></svg></div>
+          <div class="glass tile" style="color:var(--rest)"><div class="lbl">Sleep</div><div class="val" style="color:var(--ink)">7<small>h</small>12<small>m</small></div><div class="sub sec">Need 7h 30m · 88% perf.</div><div class="hyp mt10" style="height:30px"><i class="a"></i><i class="l"></i><i class="d"></i><i class="d"></i><i class="l"></i><i class="r"></i><i class="l"></i><i class="d"></i><i class="l"></i><i class="r"></i><i class="r"></i><i class="l"></i><i class="a"></i></div></div>
+          <div class="glass tile" style="color:var(--cyan)"><div class="lbl">Steps</div><div class="val" style="color:var(--ink)">6,842</div><div class="sub sec">Goal 8,000 · on pace</div><svg class="spark mt10" viewBox="0 0 100 34"><g fill="currentColor" opacity=".8"><rect x="2" y="30" width="6" height="4" rx="2"/><rect x="12" y="28" width="6" height="6" rx="2"/><rect x="22" y="22" width="6" height="12" rx="2"/><rect x="32" y="8" width="6" height="26" rx="2"/><rect x="42" y="12" width="6" height="22" rx="2"/><rect x="52" y="26" width="6" height="8" rx="2"/><rect x="62" y="18" width="6" height="16" rx="2"/><rect x="72" y="14" width="6" height="20" rx="2"/><rect x="82" y="24" width="6" height="10" rx="2"/></g></svg></div>
+        </div>
+
+        <div class="row between mt24"><div class="overline">Heart rate</div><span class="row gap6" style="font-size:11px;color:var(--rose)"><span class="dot" style="background:var(--rose);box-shadow:0 0 8px var(--rose)"></span>Live</span></div>
+        <div class="glass mt10" style="padding:14px 16px;color:var(--rose)">
+          <div class="row between"><div><div class="overline">Beats per minute</div><div class="muted" style="font-size:11px">Live · beat by beat</div></div><div class="num" style="font-size:30px;color:var(--ink)">72<small style="font-size:12px;color:var(--rose);margin-left:4px">bpm</small></div></div>
+          <svg class="spark mt10" style="height:70px" viewBox="0 0 300 70" preserveAspectRatio="none"><path class="area" d="M0 40 C20 30 30 50 50 44 S80 20 100 30 S130 55 150 48 S180 25 200 32 S230 50 250 42 S280 30 300 36 V70 H0Z"/><path stroke="currentColor" stroke-width="2.5" d="M0 40 C20 30 30 50 50 44 S80 20 100 30 S130 55 150 48 S180 25 200 32 S230 50 250 42 S280 30 300 36"/></svg>
+          <div class="row between" style="font-size:11px;color:var(--ink-2)"><span>Min 58</span><span>Avg 71</span><span>Max 96</span></div>
+        </div>
+        <div style="height:24px"></div>
+      </div>
+      <div class="tabbar glass">
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Today</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Trends</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18V9a2 2 0 012-2h14a2 2 0 012 2v9M3 13h18"/></svg>Sleep</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M7 8v8M17 8v8"/></svg>Workouts</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>More</div>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+    <div class="notes">
+      <span class="tag">Concept 1</span>
+      <h2>Prism — the evolution of today's page</h2>
+      <p>Keeps the three-ring hero, the energy bar and the live heart-rate card the current page already has, but replaces the scenic day-cycle illustration with a colour field whose hue tracks Charge (green when recovered, amber when strained, violet at night). Rings sit on one glass slab with a one-line synthesis under them, then a 2×2 metric grid with baseline deltas and sparklines.</p>
+      <h3>What changes vs today</h3>
+      <ul>
+        <li>Synthesis line moves inside the hero, so the score is never shown without its reason.</li>
+        <li>Key metrics become tiles with a baseline delta and a 7-day sparkline instead of a flat list.</li>
+        <li>Background is abstract; the "Kineva" wordmark leaves the canvas and returns to the nav.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/3fe55859-fa16-4472-bd7a-46cf38791850">Bevel — three-ring row with check-in copy under it</a>
+        <a href="https://mobbin.com/screens/6a012278-d01c-473e-b860-3c08e35311ed">WHOOP — overview with recovery/strain/sleep in one ring</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== 2 · HALO =========================== -->
+  <section class="concept" id="c2">
+    <div class="phone">
+      <div class="bg" style="background: radial-gradient(90% 60% at 50% 22%, #0f3a2e 0%, #0f1014 70%);">
+        <div class="blob" style="width:360px;height:360px;left:16px;top:60px;background:#03e095;opacity:.45;"></div>
+        <div class="blob" style="width:220px;height:220px;right:-60px;bottom:200px;background:#5bc8e8;opacity:.3;animation-delay:-8s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div class="glass pill iconbtn" style="width:auto;padding:0 14px;font-size:13px;font-weight:600">‹ &nbsp;Sun 6 Sep &nbsp;›</div>
+          <div class="avatar"></div>
+        </div>
+
+        <div class="ring mt24" style="color:var(--charge);margin:28px auto 0;width:236px;">
+          <svg width="236" height="236" viewBox="0 0 236 236"><circle class="track" cx="118" cy="118" r="104" fill="none" stroke-width="12"/><circle class="arc" cx="118" cy="118" r="104" fill="none" stroke="currentColor" stroke-width="12" stroke-dasharray="653.5" stroke-dashoffset="39" style="filter:drop-shadow(0 0 14px currentColor)"/></svg>
+          <div class="v"><div style="font-size:72px;font-weight:800;letter-spacing:-.05em;line-height:1">94</div><div class="lbl" style="font-size:12px">Charge · Peak</div><div class="delta-up mt10" style="font-size:12px;font-weight:600">▲ 6 vs yesterday</div></div>
+        </div>
+
+        <div class="g2 mt24" style="gap:10px">
+          <div class="glass pill row between" style="padding:10px 14px 10px 12px;"><span class="row gap6"><span class="dot" style="background:var(--effort);box-shadow:0 0 8px var(--effort)"></span><span style="font-size:12px;color:var(--ink-2)">Effort</span></span><b class="num" style="font-size:16px">11.4</b></div>
+          <div class="glass pill row between" style="padding:10px 14px 10px 12px;"><span class="row gap6"><span class="dot" style="background:var(--rest);box-shadow:0 0 8px var(--rest)"></span><span style="font-size:12px;color:var(--ink-2)">Rest</span></span><b class="num" style="font-size:16px">88%</b></div>
+        </div>
+
+        <div class="glass mt14" style="padding:14px 16px;">
+          <div class="overline">Why 94</div>
+          <div class="col gap10 mt10" style="font-size:13px">
+            <div class="row between"><span class="row gap10"><span class="ic" style="color:var(--cyan)">〜</span><span>HRV <b>62 ms</b></span></span><span class="delta-up">+7% · strong</span></div>
+            <div class="row between"><span class="row gap10"><span style="color:var(--rose)">♥</span><span>Resting HR <b>49 bpm</b></span></span><span class="delta-up">−2 · good</span></div>
+            <div class="row between"><span class="row gap10"><span style="color:var(--rest)">☾</span><span>Sleep <b>7h 12m</b></span></span><span class="sec">88% of need</span></div>
+            <div class="row between"><span class="row gap10"><span style="color:var(--amber)">🌡</span><span>Skin temp <b>+0.2 °C</b></span></span><span class="sec">in range</span></div>
+          </div>
+        </div>
+
+        <div class="overline mt24">Today's story</div>
+        <div class="tl mt10">
+          <div class="glass ev" style="--c:var(--rest)"><div class="t">11:32 PM – 6:58 AM</div><div class="h">Slept 7h 12m</div><div class="d">Deep 1h 26m · REM 1h 48m · 2 wakes</div></div>
+          <div class="glass ev" style="--c:var(--effort)"><div class="t">7:40 AM · 42 min</div><div class="h">Run · 8.9 effort</div><div class="d">Avg 152 bpm · 6.8 km · zone 3 mostly</div></div>
+          <div class="glass ev" style="--c:var(--rose)"><div class="t">Now</div><div class="h row between">72 bpm live <span class="dot" style="background:var(--rose);box-shadow:0 0 8px var(--rose)"></span></div><div class="d">Energy 64% · drains ~10:40 PM</div></div>
+        </div>
+        <div style="height:24px"></div>
+      </div>
+      <div class="tabbar glass">
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Today</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Trends</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18V9a2 2 0 012-2h14a2 2 0 012 2v9M3 13h18"/></svg>Sleep</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M7 8v8M17 8v8"/></svg>Workouts</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>More</div>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+    <div class="notes">
+      <span class="tag">Concept 2</span>
+      <h2>Halo — one number, then the story</h2>
+      <p>Charge becomes the single hero: a large halo ring whose glow bleeds into the background field. Effort and Rest demote to glass pills under it. A "Why 94" card lists the four drivers with their baseline deltas, then the day reads as a timeline: last night, this morning's run, and the live now-card.</p>
+      <h3>What changes vs today</h3>
+      <ul>
+        <li>One score to look at first; the other two are still one tap away and always visible.</li>
+        <li>Drivers are explicit, which the current page only shows after tapping Charge.</li>
+        <li>The timeline replaces "Your cards" as the default lower half; cards live behind Customise.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/bad32255-2039-4c36-adb1-23ba96c7a709">Opal — single hero score with pill sub-scores</a>
+        <a href="https://mobbin.com/screens/752cd0a8-8a8b-4d09-a116-4e0cab9f18c4">Eight Sleep — large number with dial and "out of range" reason</a>
+        <a href="https://mobbin.com/screens/43b74562-e60e-4b95-9047-c2a3c604eedf">Google Fit — day as a journal of sleep and workouts</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== 3 · STACK =========================== -->
+  <section class="concept" id="c3">
+    <div class="phone">
+      <div class="bg" style="background:#0b0c10;">
+        <div class="blob" style="width:300px;height:300px;left:-60px;top:40px;background:#8e6fd6;opacity:.35;"></div>
+        <div class="blob" style="width:300px;height:300px;right:-80px;top:380px;background:#03e095;opacity:.32;animation-delay:-5s;"></div>
+        <div class="blob" style="width:260px;height:260px;left:-40px;bottom:-60px;background:#f0a85a;opacity:.3;animation-delay:-12s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-title">Today</div><div class="h-sub">Sun 6 Sep · WHOOP synced 4 min ago</div></div>
+          <div class="avatar"></div>
+        </div>
+        <div class="glass seg pill mt14"><span>Yesterday</span><span class="on">Today</span><span>Week</span></div>
+
+        <!-- REST card -->
+        <div class="glass deep tint-rest mt14" style="padding:18px 18px 16px;">
+          <div class="row between"><span class="overline" style="color:var(--rest)">Rest</span><span class="chev">›</span></div>
+          <div class="row between mt10" style="align-items:flex-end">
+            <div><div class="num" style="font-size:44px;line-height:1;color:var(--rest)">88</div><div class="sec" style="font-size:13px;margin-top:4px">Sleep performance · 7h 12m of 7h 30m need</div></div>
+          </div>
+          <div class="hyp mt14"><i class="a"></i><i class="l"></i><i class="d"></i><i class="d"></i><i class="l"></i><i class="r"></i><i class="l"></i><i class="d"></i><i class="l"></i><i class="r"></i><i class="r"></i><i class="l"></i><i class="a"></i><i class="l"></i><i class="r"></i><i class="a"></i></div>
+          <div class="row between mt10" style="font-size:11px;color:var(--ink-3)"><span>11:32 PM</span><span>6:58 AM</span></div>
+          <div class="legend mt10"><span><i class="sw" style="background:var(--sleep-1)"></i>Awake 22m</span><span><i class="sw" style="background:var(--sleep-2)"></i>Light 3h 36m</span><span><i class="sw" style="background:var(--sleep-2);background-image:repeating-linear-gradient(135deg, rgba(0,0,0,.35) 0 2px, transparent 2px 5px)"></i>REM 1h 48m</span><span><i class="sw" style="background:var(--sleep-3)"></i>Deep 1h 26m</span></div>
+        </div>
+
+        <!-- CHARGE card -->
+        <div class="glass deep tint-charge mt10" style="padding:18px 18px 16px;">
+          <div class="row between"><span class="overline" style="color:var(--charge)">Charge</span><span class="chev">›</span></div>
+          <div class="row between mt10">
+            <div><div class="num" style="font-size:44px;line-height:1;color:var(--charge)">94</div><div class="sec" style="font-size:13px;margin-top:4px">Peak · 3 of 3 drivers in range</div></div>
+            <div class="ring" style="color:var(--charge)"><svg width="64" height="64" viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="26" fill="none" stroke-width="7"/><circle class="arc" cx="32" cy="32" r="26" fill="none" stroke="currentColor" stroke-width="7" stroke-dasharray="163.4" stroke-dashoffset="9.8"/></svg></div>
+          </div>
+          <div class="g3 mt14" style="gap:8px">
+            <div class="glass pill" style="padding:8px 10px;text-align:center;font-size:12px"><span class="sec">HRV</span> <b>62</b> <span class="delta-up">✓</span></div>
+            <div class="glass pill" style="padding:8px 10px;text-align:center;font-size:12px"><span class="sec">RHR</span> <b>49</b> <span class="delta-up">✓</span></div>
+            <div class="glass pill" style="padding:8px 10px;text-align:center;font-size:12px"><span class="sec">Temp</span> <b>+0.2</b> <span class="delta-up">✓</span></div>
+          </div>
+        </div>
+
+        <!-- EFFORT card -->
+        <div class="glass deep tint-effort mt10" style="padding:18px 18px 16px;">
+          <div class="row between"><span class="overline" style="color:var(--effort)">Effort</span><span class="chev">›</span></div>
+          <div class="row between mt10" style="align-items:flex-end">
+            <div><div class="num" style="font-size:44px;line-height:1;color:var(--effort)">11.4</div><div class="sec" style="font-size:13px;margin-top:4px">Target 14–16 today · room for one more session</div></div>
+          </div>
+          <div class="zones mt14"><i style="width:34%;background:#9aa7b5"></i><i style="width:28%;background:var(--charge)"></i><i style="width:22%;background:var(--amber)"></i><i style="width:12%;background:var(--effort)"></i><i style="width:4%;background:var(--rose)"></i></div>
+          <div class="legend mt10"><span><i class="sw" style="background:#9aa7b5"></i>Z1 34%</span><span><i class="sw" style="background:var(--charge)"></i>Z2 28%</span><span><i class="sw" style="background:var(--amber)"></i>Z3 22%</span><span><i class="sw" style="background:var(--effort)"></i>Z4 12%</span><span><i class="sw" style="background:var(--rose)"></i>Z5 4%</span></div>
+          <div class="row between mt14" style="font-size:13px"><span class="row gap6">🏃 <b>Run</b> <span class="sec">42 min · 8.9</span></span><span class="sec">1,140 kcal today</span></div>
+        </div>
+
+        <div class="glass mt10 row between" style="padding:14px 16px;">
+          <span class="row gap10" style="font-size:14px"><span class="dot" style="background:var(--rose);box-shadow:0 0 8px var(--rose)"></span><b>72 bpm</b> <span class="sec">live</span></span>
+          <span class="row gap10" style="font-size:13px"><span style="color:var(--mint)">⚡</span> Energy <b>64%</b></span>
+        </div>
+        <div style="height:24px"></div>
+      </div>
+      <div class="tabbar glass">
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Today</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Trends</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18V9a2 2 0 012-2h14a2 2 0 012 2v9M3 13h18"/></svg>Sleep</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M7 8v8M17 8v8"/></svg>Workouts</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>More</div>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+    <div class="notes">
+      <span class="tag">Concept 3</span>
+      <h2>Stack — three full-width score cards</h2>
+      <p>Each score is its own tall glass card with a glow tinted by its state, ordered by the time of day it matters (Rest first in the morning, Effort first in the evening). Every card carries its one chart: hypnogram for Rest, driver pills for Charge, heart-rate zones for Effort. Live HR and Energy collapse to one strip at the bottom.</p>
+      <h3>What changes vs today</h3>
+      <ul>
+        <li>No rings on the home page; the number is typographic and the chart does the explaining.</li>
+        <li>Card order reflows by time of day, which the current fixed hero cannot do.</li>
+        <li>Deep-glass (darker) slabs keep text contrast high over the coloured field.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/f41c0fde-8db3-4709-bd26-cb47092c3f1e">Ultrahuman — stacked glow cards, one metric each</a>
+        <a href="https://mobbin.com/screens/7e8e52c0-5cd4-4f38-973a-777301d15195">Oura — readiness and sleep as separate tile groups</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== 4 · LEDGER =========================== -->
+  <section class="concept" id="c4">
+    <div class="phone">
+      <div class="bg" style="background: linear-gradient(180deg,#141821 0%,#0f1014 45%);">
+        <div class="blob" style="width:260px;height:260px;left:-40px;top:-80px;background:#2f6fcb;opacity:.35;"></div>
+        <div class="blob" style="width:220px;height:220px;right:-60px;top:-40px;background:#03e095;opacity:.25;animation-delay:-9s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="glass row between" style="padding:10px 12px 10px 16px;">
+          <div><div style="font-size:17px;font-weight:700">Today</div><div class="muted" style="font-size:11px">Sun 6 Sep · synced 4 min ago</div></div>
+          <div class="row gap10">
+            <div class="ring" style="color:var(--charge)"><svg width="40" height="40" viewBox="0 0 40 40"><circle class="track" cx="20" cy="20" r="16" fill="none" stroke-width="4"/><circle class="arc" cx="20" cy="20" r="16" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="100.5" stroke-dashoffset="6"/></svg><div class="v" style="font-size:11px;font-weight:700">94</div></div>
+            <div class="ring" style="color:var(--effort)"><svg width="40" height="40" viewBox="0 0 40 40"><circle class="track" cx="20" cy="20" r="16" fill="none" stroke-width="4"/><circle class="arc" cx="20" cy="20" r="16" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="100.5" stroke-dashoffset="43"/></svg><div class="v" style="font-size:11px;font-weight:700">11</div></div>
+            <div class="ring" style="color:var(--rest)"><svg width="40" height="40" viewBox="0 0 40 40"><circle class="track" cx="20" cy="20" r="16" fill="none" stroke-width="4"/><circle class="arc" cx="20" cy="20" r="16" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="100.5" stroke-dashoffset="12"/></svg><div class="v" style="font-size:11px;font-weight:700">88</div></div>
+          </div>
+        </div>
+
+        <div class="glass mt10" style="padding:14px 16px;">
+          <div class="row between"><span class="overline">Read</span><span class="badge">Charge 94 · Peak</span></div>
+          <div class="mt10" style="font-size:14px;line-height:1.5">Best recovery in 11 days. HRV and resting HR both beat baseline, sleep hit 88% of need. Room for a hard session; aim for 14–16 effort.</div>
+        </div>
+
+        <div class="row between mt24"><span class="overline">Key statistics</span><span style="font-size:12px;color:var(--mint)">Customise</span></div>
+        <div class="glass mt10" style="padding:2px 0;">
+          <div class="lrow"><div class="ic" style="color:var(--cyan)">〜</div><div><div class="n">HRV</div><div class="b">Baseline 58 ms</div></div><svg class="spark" style="height:26px;color:var(--cyan)" viewBox="0 0 74 26"><path stroke="currentColor" d="M0 18 L10 16 L20 20 L30 13 L40 15 L50 9 L62 11 L74 6"/></svg><div class="v">62 <small>ms</small><div class="delta-up" style="font-size:11px">▲ 7%</div></div></div>
+          <div class="lrow"><div class="ic" style="color:var(--rose)">♥</div><div><div class="n">Resting HR</div><div class="b">Baseline 51 bpm</div></div><svg class="spark" style="height:26px;color:var(--rose)" viewBox="0 0 74 26"><path stroke="currentColor" d="M0 8 L10 10 L20 6 L30 11 L40 9 L50 14 L62 16 L74 18"/></svg><div class="v">49 <small>bpm</small><div class="delta-up" style="font-size:11px">▼ 2</div></div></div>
+          <div class="lrow"><div class="ic" style="color:var(--rest)">☾</div><div><div class="n">Sleep</div><div class="b">Need 7h 30m</div></div><svg class="spark" style="height:26px;color:var(--rest)" viewBox="0 0 74 26"><path stroke="currentColor" d="M0 14 L10 18 L20 10 L30 12 L40 20 L50 9 L62 12 L74 7"/></svg><div class="v">7:12<div class="delta-flat" style="font-size:11px">88%</div></div></div>
+          <div class="lrow"><div class="ic" style="color:var(--cyan)">◌</div><div><div class="n">Respiratory</div><div class="b">Baseline 14.9</div></div><svg class="spark" style="height:26px;color:var(--cyan)" viewBox="0 0 74 26"><path stroke="currentColor" d="M0 12 L10 13 L20 11 L30 12 L40 14 L50 12 L62 13 L74 12"/></svg><div class="v">14.6 <small>rpm</small><div class="delta-flat" style="font-size:11px">—</div></div></div>
+          <div class="lrow"><div class="ic" style="color:var(--amber)">🌡</div><div><div class="n">Skin temp</div><div class="b">vs 30-day</div></div><svg class="spark" style="height:26px;color:var(--amber)" viewBox="0 0 74 26"><path stroke="currentColor" d="M0 13 L10 12 L20 14 L30 13 L40 12 L50 11 L62 12 L74 10"/></svg><div class="v">+0.2 <small>°C</small><div class="delta-flat" style="font-size:11px">in range</div></div></div>
+          <div class="lrow"><div class="ic" style="color:var(--charge)">👣</div><div><div class="n">Steps</div><div class="b">Goal 8,000</div></div><svg class="spark" style="height:26px;color:var(--charge)" viewBox="0 0 74 26"><g fill="currentColor" opacity=".8"><rect x="0" y="22" width="6" height="4" rx="1.5"/><rect x="10" y="18" width="6" height="8" rx="1.5"/><rect x="20" y="8" width="6" height="18" rx="1.5"/><rect x="30" y="4" width="6" height="22" rx="1.5"/><rect x="40" y="14" width="6" height="12" rx="1.5"/><rect x="50" y="10" width="6" height="16" rx="1.5"/><rect x="60" y="16" width="6" height="10" rx="1.5"/></g></svg><div class="v">6,842<div class="delta-flat" style="font-size:11px">86%</div></div></div>
+          <div class="lrow"><div class="ic" style="color:var(--rose)">▮</div><div><div class="n">Live HR</div><div class="b">Range 58–96</div></div><svg class="spark" style="height:26px;color:var(--rose)" viewBox="0 0 74 26"><path stroke="currentColor" d="M0 14 C6 10 8 18 14 15 S22 6 28 10 S36 20 42 16 S52 8 58 12 S68 16 74 13"/></svg><div class="v">72 <small>bpm</small><div style="font-size:11px;color:var(--rose)">● live</div></div></div>
+        </div>
+
+        <div class="row between mt24"><span class="overline">Today's activities</span><span style="font-size:12px;color:var(--mint)">Start session ›</span></div>
+        <div class="glass mt10 row between" style="padding:12px 14px;">
+          <span class="row gap10"><span class="badge" style="border-color:var(--rest);color:var(--rest)">☾ 7:12</span><b style="font-size:14px">Sleep</b></span><span class="muted" style="font-size:11px">11:32 PM → 6:58 AM</span>
+        </div>
+        <div class="glass mt10 row between" style="padding:12px 14px;">
+          <span class="row gap10"><span class="badge" style="border-color:var(--effort);color:var(--effort)">🏃 8.9</span><b style="font-size:14px">Run</b></span><span class="muted" style="font-size:11px">7:40 AM · 42 min · 6.8 km</span>
+        </div>
+        <div style="height:24px"></div>
+      </div>
+      <div class="tabbar glass">
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Today</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Trends</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18V9a2 2 0 012-2h14a2 2 0 012 2v9M3 13h18"/></svg>Sleep</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M7 8v8M17 8v8"/></svg>Workouts</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>More</div>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+    <div class="notes">
+      <span class="tag">Concept 4</span>
+      <h2>Ledger — dense, numbers-first</h2>
+      <p>For the wearer who wants the data, not the framing. The three scores shrink to a compact ring trio in a glass toolbar so they are visible while scrolling, a short "Read" paragraph explains the day, and the bulk of the page is one glass ledger: every key statistic as a row with its baseline, a seven-day sparkline and a delta. Activities are a short list under it.</p>
+      <h3>What changes vs today</h3>
+      <ul>
+        <li>Most information per scroll of any concept; nothing is hidden behind a card tap.</li>
+        <li>Ledger rows map one-to-one onto the existing Key Metrics customisation.</li>
+        <li>Glass is lighter here; the background field is calmer so the rows stay legible.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/3549c0ec-328d-4586-ab7a-38d743d85580">WHOOP — key statistics list with baselines and deltas</a>
+        <a href="https://mobbin.com/screens/41d22e2e-f527-49e1-aac9-af54b65f880b">Garmin Connect — metric rows with "within range" mini-arcs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== 5 · FOCUS =========================== -->
+  <section class="concept" id="c5">
+    <div class="phone">
+      <div class="bg" style="background: radial-gradient(100% 70% at 30% 0%, #10352b, #0f1014 65%);">
+        <div class="blob" style="width:340px;height:340px;left:-100px;top:-40px;background:#54e6bd;opacity:.4;"></div>
+        <div class="blob" style="width:240px;height:240px;right:-70px;top:220px;background:#f0a85a;opacity:.22;animation-delay:-7s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-sub" style="margin:0 0 4px">Sunday morning</div><div class="h-title" style="font-size:30px">Good to go, Kris.</div></div>
+          <div class="avatar"></div>
+        </div>
+
+        <div class="glass mt18" style="padding:18px 18px 16px;">
+          <div class="row between"><span class="overline">Now</span><span class="badge">Charge 94</span></div>
+          <div class="mt10" style="font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.2">You're fully recovered. Today is a day to push.</div>
+          <div class="sec mt10" style="font-size:13px;line-height:1.5">Sleep hit 88% of need and HRV is 7% above baseline. A hard session lands you at 14–16 effort without touching tomorrow's Charge.</div>
+          <div class="cta mt14">▶ &nbsp;Start a session</div>
+          <div class="row between mt10" style="font-size:11px;color:var(--ink-3)"><span>Morning run already logged · 8.9</span><span>Effort so far 11.4</span></div>
+        </div>
+
+        <div class="g3 mt10" style="gap:8px">
+          <div class="glass tile" style="padding:12px 10px;text-align:center"><div style="font-size:20px">✍️</div><div style="font-size:11px;margin-top:6px">Journal</div></div>
+          <div class="glass tile" style="padding:12px 10px;text-align:center"><div style="font-size:20px;color:var(--cyan)">〜</div><div style="font-size:11px;margin-top:6px">HRV reading</div></div>
+          <div class="glass tile" style="padding:12px 10px;text-align:center"><div style="font-size:20px">☕</div><div style="font-size:11px;margin-top:6px">Log caffeine</div></div>
+        </div>
+
+        <div class="overline mt24">At a glance</div>
+        <div class="glass mt10" style="padding:6px 16px;">
+          <div class="row between" style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)"><span class="row gap10"><span class="dot" style="background:var(--rest)"></span><span style="font-size:14px">Rest</span></span><span class="row gap10"><b class="num">7h 12m</b><span class="sec" style="font-size:12px">88%</span><span class="chev">›</span></span></div>
+          <div class="row between" style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)"><span class="row gap10"><span class="dot" style="background:var(--effort)"></span><span style="font-size:14px">Effort</span></span><span class="row gap10"><b class="num">11.4</b><span class="sec" style="font-size:12px">of 14–16</span><span class="chev">›</span></span></div>
+          <div class="row between" style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)"><span class="row gap10"><span class="dot" style="background:var(--mint)"></span><span style="font-size:14px">Energy</span></span><span class="row gap10"><b class="num">64%</b><span class="sec" style="font-size:12px">to 10:40 PM</span><span class="chev">›</span></span></div>
+          <div class="row between" style="padding:10px 0"><span class="row gap10"><span class="dot" style="background:var(--rose);box-shadow:0 0 8px var(--rose)"></span><span style="font-size:14px">Heart rate</span></span><span class="row gap10"><b class="num">72</b><span class="sec" style="font-size:12px">live</span><span class="chev">›</span></span></div>
+        </div>
+
+        <div class="overline mt24">One thing</div>
+        <div class="glass mt10" style="padding:14px 16px;">
+          <div class="row gap10" style="align-items:flex-start"><span style="font-size:20px;color:var(--amber)">✦</span><div><div style="font-size:14px;font-weight:600">Caffeine after 2 PM cost you 9 min of deep sleep</div><div class="sec mt10" style="font-size:12px;line-height:1.5">Across 18 logged days, late caffeine nights averaged 1h 17m deep vs 1h 26m otherwise. Small but consistent.</div></div></div>
+        </div>
+        <div style="height:24px"></div>
+      </div>
+      <div class="tabbar glass">
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Today</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Trends</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18V9a2 2 0 012-2h14a2 2 0 012 2v9M3 13h18"/></svg>Sleep</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M7 8v8M17 8v8"/></svg>Workouts</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>More</div>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+    <div class="notes">
+      <span class="tag">Concept 5</span>
+      <h2>Focus — coach first, numbers second</h2>
+      <p>Leads with a sentence, not a score. The Now card adapts to the hour: recovery and a plan in the morning, a wind-down prompt in the evening, with the single most useful action as a full-width button. Quick actions sit under it. Scores appear as a plain glance list, and one correlation insight closes the page.</p>
+      <h3>What changes vs today</h3>
+      <ul>
+        <li>Charge, Effort and Rest are read as words first; the number is still there but smaller.</li>
+        <li>Primary action changes through the day (Start session, HRV reading, Bedtime).</li>
+        <li>"One thing" surfaces the correlation engine on the home page instead of in Trends.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/3a6e3571-22fe-4659-80ac-7249374e4947">TIDE — greeting-led home with glass quick actions</a>
+        <a href="https://mobbin.com/screens/3fe55859-fa16-4472-bd7a-46cf38791850">Bevel — check-in copy explaining the score</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== 6 · BENTO =========================== -->
+  <section class="concept" id="c6">
+    <div class="phone">
+      <div class="bg" style="background:#0e1016;">
+        <div class="blob" style="width:280px;height:280px;left:-60px;top:-20px;background:#03e095;opacity:.3;"></div>
+        <div class="blob" style="width:260px;height:260px;right:-80px;top:260px;background:#8e6fd6;opacity:.32;animation-delay:-4s;"></div>
+        <div class="blob" style="width:240px;height:240px;left:40px;bottom:-40px;background:#5bc8e8;opacity:.25;animation-delay:-13s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-title">Today</div><div class="h-sub">Sunday, 6 September</div></div>
+          <div class="row gap6"><div class="glass pill" style="padding:8px 12px;font-size:12px;color:var(--mint)">Edit</div><div class="avatar"></div></div>
+        </div>
+
+        <div class="bento mt18">
+          <div class="glass h2 tile" style="display:flex;flex-direction:column;justify-content:space-between">
+            <div class="row between"><span class="overline">Charge</span><span class="chev">›</span></div>
+            <div class="ring" style="color:var(--charge);margin:0 auto"><svg width="132" height="132" viewBox="0 0 132 132"><circle class="track" cx="66" cy="66" r="56" fill="none" stroke-width="11"/><circle class="arc" cx="66" cy="66" r="56" fill="none" stroke="currentColor" stroke-width="11" stroke-dasharray="351.9" stroke-dashoffset="21"/></svg><div class="v"><div class="big" style="font-size:40px">94</div><div class="lbl">Peak</div></div></div>
+            <div class="sec" style="font-size:11px;text-align:center">HRV ▲7% · RHR ▼2 · Sleep 88%</div>
+          </div>
+          <div class="glass tile" style="color:var(--effort)"><div class="row between"><span class="lbl">Effort</span><span class="chev">›</span></div><div class="val" style="color:var(--ink)">11.4</div><div class="sub sec">of 14–16 target</div><div class="zones mt10" style="height:6px"><i style="width:34%;background:#9aa7b5"></i><i style="width:28%;background:var(--charge)"></i><i style="width:22%;background:var(--amber)"></i><i style="width:12%;background:var(--effort)"></i><i style="width:4%;background:var(--rose)"></i></div></div>
+          <div class="glass tile" style="color:var(--rest)"><div class="row between"><span class="lbl">Rest</span><span class="chev">›</span></div><div class="val" style="color:var(--ink)">7<small>h</small>12<small>m</small></div><div class="sub sec">88% of need</div><div class="hyp mt10" style="height:18px"><i class="a"></i><i class="l"></i><i class="d"></i><i class="d"></i><i class="l"></i><i class="r"></i><i class="l"></i><i class="d"></i><i class="l"></i><i class="r"></i><i class="l"></i><i class="a"></i></div></div>
+
+          <div class="glass w2 tile" style="color:var(--rose)"><div class="row between"><span class="row gap6"><span class="dot" style="background:var(--rose);box-shadow:0 0 8px var(--rose)"></span><span class="lbl">Heart rate · live</span></span><span class="num" style="font-size:22px;color:var(--ink)">72 <small style="font-size:11px;color:var(--rose)">bpm</small></span></div><svg class="spark mt10" style="height:52px" viewBox="0 0 300 52" preserveAspectRatio="none"><path class="area" d="M0 30 C20 22 30 38 50 33 S80 14 100 22 S130 42 150 36 S180 18 200 24 S230 38 250 32 S280 22 300 27 V52 H0Z"/><path stroke="currentColor" stroke-width="2.5" d="M0 30 C20 22 30 38 50 33 S80 14 100 22 S130 42 150 36 S180 18 200 24 S230 38 250 32 S280 22 300 27"/></svg></div>
+
+          <div class="glass tile" style="color:var(--cyan)"><div class="lbl">HRV</div><div class="val" style="color:var(--ink)">62<small>ms</small></div><div class="sub delta-up">▲ 4 vs 58</div><svg class="spark" style="height:22px" viewBox="0 0 100 22"><path stroke="currentColor" d="M0 16 L14 14 L28 18 L42 11 L56 13 L70 7 L84 9 L100 4"/></svg></div>
+          <div class="glass tile" style="color:var(--rose)"><div class="lbl">Resting HR</div><div class="val" style="color:var(--ink)">49<small>bpm</small></div><div class="sub delta-up">▼ 2 vs 51</div><svg class="spark" style="height:22px" viewBox="0 0 100 22"><path stroke="currentColor" d="M0 6 L14 8 L28 4 L42 9 L56 7 L70 12 L84 14 L100 16"/></svg></div>
+
+          <div class="glass tile" style="color:var(--mint)"><div class="row between"><span class="lbl">Energy</span><span class="num" style="font-size:14px;color:var(--ink)">64%</span></div><div class="bar mt10"><i style="width:64%"></i></div><div class="sub sec">Drains ~10:40 PM</div></div>
+          <div class="glass tile" style="color:var(--charge)"><div class="lbl">Steps</div><div class="val" style="color:var(--ink)">6,842</div><div class="sub sec">86% of 8,000</div></div>
+
+          <div class="glass tile" style="color:var(--amber)"><div class="lbl">Skin temp</div><div class="val" style="color:var(--ink)">+0.2<small>°C</small></div><div class="sub sec">in range</div></div>
+          <div class="glass tile" style="color:var(--cyan)"><div class="lbl">Stress</div><div class="val" style="color:var(--ink)">32<small>low</small></div><div class="sub sec">Autonomic load</div></div>
+
+          <div class="glass w2 tile row between" style="padding:14px 16px"><span class="row gap10"><span style="font-size:18px">🏃</span><span><b style="font-size:14px">Run</b> <span class="sec" style="font-size:12px">7:40 AM · 42 min · 6.8 km</span></span></span><span class="badge" style="border-color:var(--effort);color:var(--effort)">8.9</span></div>
+        </div>
+        <div class="cta mt14">＋ &nbsp;Add a tile</div>
+        <div style="height:24px"></div>
+      </div>
+      <div class="tabbar glass">
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Today</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Trends</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18V9a2 2 0 012-2h14a2 2 0 012 2v9M3 13h18"/></svg>Sleep</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M7 8v8M17 8v8"/></svg>Workouts</div>
+        <div class="tab"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>More</div>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+    <div class="notes">
+      <span class="tag">Concept 6</span>
+      <h2>Bento — a widget grid you rearrange</h2>
+      <p>The home page becomes a grid of glass tiles in three sizes, like the iOS home screen. Charge is the 1×2 anchor, Effort and Rest are singles beside it, live HR spans the row, and everything below is the wearer's choice. Edit mode reorders and resizes; the existing Key Metrics and Your Cards catalogues become the tile library.</p>
+      <h3>What changes vs today</h3>
+      <ul>
+        <li>One customisation model instead of three (hero, key metrics, your cards).</li>
+        <li>Every tile is also a home-screen widget, so the two stay visually identical.</li>
+        <li>Densest use of the glass material; the field behind it needs to stay low-contrast.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/764a373b-c468-4102-b020-65718d705329">Moonlitt — mixed-size glass tiles on a tinted field</a>
+        <a href="https://mobbin.com/screens/5b8d5290-6c52-436f-bac3-9d0a531db829">Apple Fitness — summary tiles with per-tile charts</a>
+        <a href="https://mobbin.com/screens/7e8e52c0-5cd4-4f38-973a-777301d15195">Oura — tile groups per domain</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:48px 0 0;border-top:1px solid var(--hair);color:var(--ink-2);font-size:14px;line-height:1.6;max-width:760px">
+    <h2 style="color:var(--ink);font-size:20px;margin:0 0 8px">Shared decisions</h2>
+    <ul style="padding-left:18px">
+      <li><b>Background.</b> Three slow-drifting colour blobs under a fine grain, hue keyed to state. It reads as "liquid" without a scene, and it costs one Canvas layer instead of a scenic asset per hour of the day.</li>
+      <li><b>Glass.</b> One material: 28pt blur, 170% saturation, 1pt hairline at 14% white, specular top edge. A darker "deep" variant is used where long text sits over a bright field.</li>
+      <li><b>Colour.</b> Score hues are the app's own tokens and are always paired with a label and a number, never colour alone. Sleep depth is a single-hue ramp with hatching for REM, so it survives colour-vision deficiency.</li>
+      <li><b>Tab bar.</b> Floating glass pill, as in iOS 26, in every concept. The Live tab folds into the heart-rate card's "Full day" link.</li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>
