@@ -165,6 +165,13 @@
   /* energy bar */
   .bar { height: 8px; border-radius: 6px; background: rgba(255,255,255,.10); overflow: hidden; }
   .bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--mint), #a8f2dc); box-shadow: 0 0 10px rgba(84,230,189,.5); }
+
+  /* expanded mode: phones grow to their full content */
+  body.expanded .phone { height: auto; }
+  body.expanded .phone .scroll { position: static; overflow: visible; padding-bottom: 8px; }
+  body.expanded .phone .tabbar { position: relative; left: auto; right: auto; bottom: auto; margin: 4px 16px 10px; }
+  body.expanded .phone .home-ind { position: relative; left: auto; bottom: auto; transform: none; margin: 0 auto 12px; }
+  .toggle { margin-left: auto; cursor: pointer; border-color: var(--mint) !important; color: var(--mint) !important; }
 </style>
 </head>
 <body>
@@ -174,6 +181,7 @@
   <p class="meta">Scores use the app's own tokens (Charge green, Effort amber, Rest violet, mint accent). Sleep depth is drawn as a single-hue ramp with a legend so it survives colour-vision deficiency. References were pulled from Mobbin and are linked under each concept.</p>
   <div class="toc">
     <a href="#c1">1 · Prism</a><a href="#c2">2 · Halo</a><a href="#c3">3 · Stack</a><a href="#c4">4 · Ledger</a><a href="#c5">5 · Focus</a><a href="#c6">6 · Bento</a>
+    <a class="toggle" id="toggle" href="#" onclick="document.body.classList.toggle('expanded');this.textContent=document.body.classList.contains('expanded')?'Phone view':'Show full pages';return false;">Show full pages</a>
   </div>
 
   <!-- =========================== 1 · PRISM =========================== -->
