@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kineva — controls, rings, motion: before and after</title>
+<style>body{margin:0;background:#0f1014;color:#f7f7fa;font-family:-apple-system,system-ui,sans-serif;padding:32px 20px}h1{font-size:24px;margin:0 0 6px}h2{font-size:18px;margin:40px 0 4px}p{color:#c3c4ca;max-width:760px;line-height:1.5;margin:0 0 6px}.pair{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;align-items:flex-start}.col{display:flex;gap:10px;flex-wrap:wrap}figure{margin:0;width:260px}img{width:260px;border-radius:24px;box-shadow:0 16px 48px rgba(0,0,0,.6)}figcaption{color:#9a9ca4;font-size:12px;margin-top:6px}.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#69ddb8;margin:10px 0 4px}.lbl.b{color:#ff6b81}ul{color:#c3c4ca;line-height:1.55;font-size:14px;max-width:760px}table{border-collapse:collapse;font-size:13px;max-width:900px}th,td{text-align:left;padding:8px 10px;border-top:1px solid rgba(255,255,255,.12);vertical-align:top;color:#c3c4ca}th{color:#7d7f88;font-size:11px;letter-spacing:.1em;text-transform:uppercase}td:first-child{color:#f7f7fa;font-weight:600}</style></head><body>
+<h1>Controls, rings, motion — before and after</h1>
+<p>One range control, one stepper, one ring, one haptic vocabulary, and the performance fixes found on the way. Real build, iPhone 17 Pro simulator, demo data.</p>
+
+<h2>Range control (metric pages, exercise page)</h2>
+<p>Before: a left-aligned pill, locked ranges shown as faded text with no explanation. After: full width, equal segments, a sliding capsule, a haptic on change, a lock glyph on ranges that need more history, and a tap on a locked range says how many more days it needs.</p>
+<div class="pair"><div><div class="lbl b">Before</div><div class="col"><figure><img src="b-metric.png"></figure></div></div><div><div class="lbl">After</div><div class="col"><figure><img src="a-metric.png"></figure></div></div></div>
+
+<h2>Stepper (nights on Stages, weeks on Trends)</h2>
+<p>Before: bare chevrons in two different headers. After: one stepper with glass round buttons, the title in the middle crossfading as numeric text, a tick per step and a warning tick at the ends.</p>
+<div class="pair"><div><div class="lbl b">Before</div><div class="col"><figure><img src="b-stages.png"></figure><figure><img src="b-trends.png"></figure></div></div><div><div class="lbl">After</div><div class="col"><figure><img src="a-stages.png"></figure><figure><img src="a-trends.png"></figure></div></div></div>
+
+<h2>The one ring</h2>
+<p>StrandRing: five sizes (hero 236, large 124, medium 72, small 40, micro 22) plus custom, stroke derived from diameter, glow that scales and switches off below small, the house spring on draw-in, still under Reduce Motion, Low Power and the in-app quiet-motion setting. Used now by the Today hero and its Effort/Rest cards, the Night hero, the Week in review gauges (which were liquid vessels), the Trends week rows and the Workouts progress ring.</p>
+<div class="pair"><div><div class="lbl b">Before</div><div class="col"><figure><img src="b-week.png"><figcaption>Vessel gauges in Week in review</figcaption></figure></div></div><div><div class="lbl">After</div><div class="col"><figure><img src="a-week.png"><figcaption>Same ring as the hero, large size</figcaption></figure><figure><img src="a-today.png"><figcaption>Hero and small sizes on Today</figcaption></figure></div></div></div>
+
+<h2>Motion and haptics</h2>
+<ul>
+<li>Every row that opens a page gives the same light tick. Range and stepper changes tick; a locked range or an end-of-range step gives the warning tick.</li>
+<li>Drill-down sections reveal in sequence (fade + 8pt rise, 40 ms apart). Hero numbers and stepper titles crossfade as numeric text.</li>
+<li>Rings draw in with the gentle spring (hero spring above 124pt) and re-animate on value change.</li>
+</ul>
+
+<h2>Performance review</h2>
+<table><tr><th>Where</th><th>Finding</th><th>Status</th></tr>
+<tr><td>Exercise page</td><td>One store read per session id in a loop (a lifter with 200 sessions of squats made 200 queries on open).</td><td>Fixed: one session read, filtered in memory.</td></tr>
+<tr><td>Workouts hub</td><td>Each exercise's history read twice per load (records pass and lift tiles).</td><td>Fixed: one read per exercise, shared.</td></tr>
+<tr><td>Trends (Pulse)</td><td>Finding, three week rows and four signals recomputed on every body pass over the whole history (about ten full walks per render; a render happens on every repository publish).</td><td>Fixed: memoized on the same key as the classic model.</td></tr>
+<tr><td>Colour field</td><td>Three blurred circles redrawn 20× a second whenever a Halo tab is on screen, including in Low Power Mode.</td><td>Fixed: 12 fps, and still under Low Power / quiet motion. Pushed pages were already static.</td></tr>
+<tr><td>Metric page</td><td>Correlations need every metric's series; that load is cached on the repository per refresh, so a second metric page is cheap. Recomputation is cached per range.</td><td>Already fine; verified.</td></tr>
+<tr><td>Sleep tab (Night)</td><td>Stage coverage recomputed per body pass; the classic model is memoized and the coverage walk is over a handful of blocks.</td><td>Left as is; not measurable.</td></tr>
+<tr><td>Set ledger</td><td>Every mutation upserts all rows of the session (tens of rows). Cheap today; would matter at hundreds.</td><td>Left as is; noted.</td></tr>
+</table>
+
+<h2>What else would make these screens better</h2>
+<ul>
+<li><b>Metric page:</b> tap-and-hold scrubbing on the chart with the value and day in the hero (the chart supports hover on macOS; iOS needs a drag). Baseline band (30-day mean ± 1 SD) drawn under the line so "vs average" is visible, not only printed.</li>
+<li><b>Stages page:</b> the stage bars and the vs-typical bars are two cards saying the same thing; fold the typical marker into the stage rows and drop the second card.</li>
+<li><b>Week in review:</b> the digest's Rest gauge and the week card's Rest use different composites (this predates the redesign); pick one so the two never disagree by a few points.</li>
+<li><b>Sleep debt:</b> the ledger card's headline could become the contributor row's verdict source so both always match.</li>
+<li><b>Log:</b> the sleep-marks card is a Phase-1 placeholder; either finish it (marks feed the staging) or move it to Settings.</li>
+<li><b>Everywhere:</b> long-press on a row for a quick peek of the destination (a context-menu preview), and swipe-back haptic on pop.</li>
+</ul>
+<p style="margin-top:32px"><a href="../subscreens/" style="color:#69ddb8">← Drill-downs before/after</a> · <a href="../" style="color:#69ddb8">Trends &amp; Sleep concepts</a></p></body></html>
