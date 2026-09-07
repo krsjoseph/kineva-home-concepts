@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kineva — Trends &amp; Sleep concepts</title>
+<style>
+  :root {
+    --canvas: #0f1014;
+    --surface: #1d1e23;
+    --surface-2: #2a2c34;
+    --ink: #f7f7fa;
+    --ink-2: #c3c4ca;
+    --ink-3: #7d7f88;
+    --hair: rgba(255,255,255,.12);
+    --hair-strong: rgba(255,255,255,.22);
+    --mint: #69ddb8;
+    --mint-glow: #54e6bd;
+    --charge: #03e095;
+    --effort: #f0a85a;
+    --rest: #8e6fd6;
+    --cyan: #5bc8e8;
+    --rose: #ff6b81;
+    --amber: #f2c53d;
+    --sleep-1: #dbe6f7;
+    --sleep-2: #8fb6ec;
+    --sleep-3: #4f86d6;
+    --sleep-4: #2a4c8f;
+    --radius: 26px;
+    --font: -apple-system, "SF Pro Text", "SF Pro Display", Inter, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+  a { color: var(--mint); }
+  .page { max-width: 1240px; margin: 0 auto; padding: 48px 24px 120px; }
+  .page h1 { font-size: 34px; letter-spacing: -.02em; margin: 0 0 8px; }
+  .page .lede { color: var(--ink-2); max-width: 760px; line-height: 1.5; font-size: 16px; margin: 0 0 12px; }
+  .page .meta { color: var(--ink-3); font-size: 13px; margin-bottom: 36px; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 56px; }
+  .toc a { text-decoration: none; color: var(--ink-2); font-size: 13px; padding: 8px 12px; border: 1px solid var(--hair); border-radius: 999px; background: rgba(255,255,255,.03); }
+  .toc a:hover { border-color: var(--hair-strong); color: var(--ink); }
+  .concept { display: grid; grid-template-columns: 420px 1fr; gap: 40px; align-items: start; padding: 48px 0; border-top: 1px solid var(--hair); }
+  .concept .notes h2 { font-size: 24px; margin: 4px 0 4px; letter-spacing: -.01em; }
+  .concept .notes .tag { display: inline-block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mint); margin-bottom: 8px; }
+  .concept .notes p { color: var(--ink-2); line-height: 1.55; font-size: 15px; }
+  .concept .notes h3 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin: 22px 0 8px; }
+  .concept .notes ul { margin: 0; padding-left: 18px; color: var(--ink-2); line-height: 1.55; font-size: 14px; }
+  .concept .notes li { margin-bottom: 4px; }
+  .concept .notes .refs a { display: block; font-size: 13px; margin-bottom: 4px; }
+  @media (max-width: 900px) { .concept { grid-template-columns: 1fr; } .phone { margin: 0 auto; } }
+
+  /* ---------- phone frame ---------- */
+  .phone { width: 393px; height: 852px; border-radius: 54px; position: relative; overflow: hidden; background: #000; box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 10px #17181c, 0 0 0 12px #2a2c34; isolation: isolate; }
+  .phone .bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+  .phone .bg .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; mix-blend-mode: screen; animation: drift 18s ease-in-out infinite alternate; }
+  @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(18px,-26px) scale(1.12); } }
+  .phone .bg .grain { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.035) 1px, transparent 1px); background-size: 3px 3px; opacity: .5; }
+  .phone .status { position: absolute; top: 0; left: 0; right: 0; height: 54px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 30px 6px; font-size: 15px; font-weight: 600; z-index: 5; }
+  .phone .island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 122px; height: 36px; border-radius: 20px; background: #000; z-index: 6; }
+  .phone .scroll { position: absolute; inset: 0; padding: 66px 16px 110px; overflow-y: auto; z-index: 2; scrollbar-width: none; }
+  .phone .scroll::-webkit-scrollbar { display: none; }
+  .phone .tabbar { position: absolute; left: 16px; right: 16px; bottom: 22px; height: 64px; border-radius: 34px; display: grid; grid-template-columns: repeat(5,1fr); align-items: center; z-index: 4; }
+  .tabbar .tab { text-align: center; font-size: 10px; color: var(--ink-2); display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .tabbar .tab svg { width: 22px; height: 22px; }
+  .tabbar .tab.on { color: var(--mint); }
+  .tabbar .tab.on .pill { position: absolute; }
+  .home-ind { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.55); z-index: 5; }
+
+  /* ---------- glass ---------- */
+  .glass { background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(255,255,255,.035) 45%, rgba(255,255,255,.06)); backdrop-filter: blur(28px) saturate(170%); -webkit-backdrop-filter: blur(28px) saturate(170%); border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.25), 0 12px 32px rgba(0,0,0,.35); position: relative; }
+  .glass::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(120% 60% at 20% 0%, rgba(255,255,255,.14), transparent 60%); pointer-events: none; }
+  .glass.deep { background: linear-gradient(160deg, rgba(13,14,20,.72), rgba(13,14,20,.55)); }
+  .glass.pill { border-radius: 999px; }
+  .glass.tint-charge { box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 12px 40px rgba(3,224,149,.18); }
+  .glass.tint-effort { box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 12px 40px rgba(240,168,90,.18); }
+  .glass.tint-rest { box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 12px 40px rgba(142,111,214,.22); }
+
+  /* ---------- type ---------- */
+  .h-title { font-size: 34px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+  .h-sub { font-size: 13px; color: var(--ink-2); margin-top: 6px; }
+  .overline { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+  .num { font-variant-numeric: tabular-nums; font-weight: 700; letter-spacing: -.02em; }
+  .muted { color: var(--ink-3); }
+  .sec { color: var(--ink-2); }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .between { justify-content: space-between; }
+  .col { display: flex; flex-direction: column; }
+  .gap6 { gap: 6px; } .gap10 { gap: 10px; } .gap14 { gap: 14px; }
+  .mt10 { margin-top: 10px; } .mt14 { margin-top: 14px; } .mt18 { margin-top: 18px; } .mt24 { margin-top: 24px; }
+  .chev { color: var(--ink-3); font-size: 16px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#f0a85a,#8e6fd6); border: 2px solid rgba(255,255,255,.35); }
+  .iconbtn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 20px; color: var(--ink); }
+  .badge { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--hair); color: var(--ink-2); }
+  .delta-up { color: var(--charge); } .delta-down { color: var(--rose); } .delta-flat { color: var(--ink-3); }
+
+  /* rings */
+  .ring { position: relative; display: grid; place-items: center; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .track { stroke: rgba(255,255,255,.10); }
+  .ring .arc { stroke-linecap: round; filter: drop-shadow(0 0 6px currentColor); }
+  .ring .v { position: absolute; text-align: center; }
+  .ring .v .big { font-size: 28px; font-weight: 700; letter-spacing: -.03em; }
+  .ring .v .lbl { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); margin-top: -2px; }
+
+  /* sparkline */
+  .spark { width: 100%; height: 34px; display: block; }
+  .spark path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .spark .base { stroke: rgba(255,255,255,.12); stroke-dasharray: 2 4; }
+  .spark .area { fill: currentColor; opacity: .12; stroke: none; }
+
+  /* hypnogram (single-hue depth ramp) */
+  .hyp { display: flex; gap: 2px; align-items: flex-end; height: 44px; }
+  .hyp i { flex: 1; border-radius: 3px 3px 0 0; display: block; }
+  .hyp .a { background: var(--sleep-1); height: 18%; }
+  .hyp .l { background: var(--sleep-2); height: 45%; }
+  .hyp .r { background: var(--sleep-2); height: 45%; background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.35) 0 2px, transparent 2px 5px); }
+  .hyp .d { background: var(--sleep-3); height: 100%; }
+  .legend { display: flex; gap: 12px; font-size: 10px; color: var(--ink-2); flex-wrap: wrap; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; vertical-align: -1px; margin-right: 4px; }
+
+  /* grids */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .tile { padding: 14px 14px 12px; }
+  .tile .lbl { font-size: 11px; color: var(--ink-2); letter-spacing: .04em; }
+  .tile .val { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-top: 6px; line-height: 1; }
+  .tile .val small { font-size: 12px; font-weight: 500; color: var(--ink-2); margin-left: 3px; letter-spacing: 0; }
+  .tile .sub { font-size: 11px; margin-top: 6px; }
+
+  /* CTA */
+  .cta { height: 54px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 15px; color: #0b1512; background: linear-gradient(180deg, #8ff0d0, var(--mint)); box-shadow: 0 8px 24px rgba(84,230,189,.28), inset 0 1px 0 rgba(255,255,255,.6); }
+
+  /* bento */
+  .bento { display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 118px; gap: 10px; }
+  .bento .w2 { grid-column: span 2; } .bento .h2 { grid-row: span 2; }
+
+  /* ledger rows */
+  .lrow { display: grid; grid-template-columns: 34px 1fr 74px 80px; align-items: center; gap: 10px; padding: 12px 14px; border-top: 1px solid rgba(255,255,255,.08); }
+  .lrow:first-child { border-top: 0; }
+  .lrow .ic { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; font-size: 15px; background: rgba(255,255,255,.08); }
+  .lrow .n { font-size: 14px; font-weight: 600; }
+  .lrow .b { font-size: 11px; color: var(--ink-3); }
+  .lrow .v { font-size: 18px; font-weight: 700; text-align: right; letter-spacing: -.02em; }
+  .lrow .v small { font-size: 11px; color: var(--ink-2); font-weight: 500; }
+
+  /* timeline */
+  .tl { position: relative; padding-left: 26px; }
+  .tl::before { content: ""; position: absolute; left: 9px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--rest), var(--effort), var(--rose)); border-radius: 2px; opacity: .8; }
+  .tl .ev { position: relative; padding: 12px 14px; margin-bottom: 10px; }
+  .tl .ev::before { content: ""; position: absolute; left: -22px; top: 18px; width: 10px; height: 10px; border-radius: 50%; background: var(--c, var(--mint)); box-shadow: 0 0 0 4px rgba(0,0,0,.35), 0 0 10px var(--c, var(--mint)); }
+  .tl .t { font-size: 11px; color: var(--ink-3); }
+  .tl .h { font-size: 15px; font-weight: 600; margin-top: 2px; }
+  .tl .d { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+
+  /* segmented */
+  .seg { display: flex; padding: 3px; gap: 2px; }
+  .seg span { flex: 1; text-align: center; font-size: 12px; padding: 7px 0; border-radius: 999px; color: var(--ink-2); }
+  .seg span.on { background: rgba(255,255,255,.14); color: var(--ink); font-weight: 600; }
+
+  /* zone bar */
+  .zones { display: flex; gap: 2px; height: 10px; border-radius: 6px; overflow: hidden; }
+  .zones i { display: block; height: 100%; }
+
+  /* energy bar */
+  .bar { height: 8px; border-radius: 6px; background: rgba(255,255,255,.10); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--mint), #a8f2dc); box-shadow: 0 0 10px rgba(84,230,189,.5); }
+
+  /* expanded mode: phones grow to their full content */
+  body.expanded .phone { height: auto; }
+  body.expanded .phone .scroll { position: relative; inset: auto; z-index: 2; overflow: visible; padding-bottom: 8px; }
+  body.expanded .phone .tabbar { position: relative; left: auto; right: auto; bottom: auto; margin: 4px 16px 10px; }
+  body.expanded .phone .home-ind { position: relative; left: auto; bottom: auto; transform: none; margin: 0 auto 12px; }
+  .toggle { margin-left: auto; cursor: pointer; border-color: var(--mint) !important; color: var(--mint) !important; }
+</style>
+<style>
+  /* ---------- additions for Trends / Sleep ---------- */
+  .concept.pair { grid-template-columns: 420px 420px 1fr; }
+  @media (max-width: 1300px) { .concept.pair { grid-template-columns: 420px 1fr; } .concept.pair .phone.second { grid-column: 1; } }
+  @media (max-width: 900px) { .concept.pair { grid-template-columns: 1fr; } }
+  .phone .cap { position: absolute; top: 0; left: 0; right: 0; text-align: center; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); padding-top: 2px; z-index: 7; pointer-events: none; }
+  .navbar { display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 600; height: 32px; }
+  .navbar .back { color: var(--mint); font-weight: 500; font-size: 14px; }
+  .navbar .act { color: var(--mint); font-weight: 500; font-size: 14px; }
+  .mrow { display: grid; grid-template-columns: 1fr 84px 76px 14px; align-items: center; gap: 10px; padding: 12px 14px; border-top: 1px solid rgba(255,255,255,.08); }
+  .mrow:first-child { border-top: 0; }
+  .mrow .n { font-size: 14px; font-weight: 600; }
+  .mrow .d { font-size: 11px; margin-top: 2px; }
+  .mrow .v { font-size: 18px; font-weight: 700; text-align: right; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .mrow .v small { font-size: 11px; color: var(--ink-2); font-weight: 500; margin-left: 2px; }
+  .mrow .spark { height: 26px; width: 76px; }
+  .mrow.compact { grid-template-columns: 1fr auto 14px; }
+  .crow { display: grid; grid-template-columns: 1fr auto 14px; align-items: center; gap: 12px; padding: 11px 14px; border-top: 1px solid rgba(255,255,255,.08); }
+  .crow:first-child { border-top: 0; }
+  .crow .n { font-size: 14px; font-weight: 600; }
+  .crow .bar { margin-top: 7px; height: 5px; width: 100%; }
+  .crow .bar i { background: currentColor; box-shadow: none; }
+  .crow .verdict { font-size: 12px; font-weight: 600; text-align: right; white-space: nowrap; }
+  .crow .verdict small { display: block; font-size: 10px; color: var(--ink-3); font-weight: 500; }
+  .pips { display: flex; gap: 4px; }
+  .pips i { flex: 1; height: 7px; border-radius: 3px; background: rgba(255,255,255,.12); display: block; }
+  .pips i.f { background: currentColor; box-shadow: 0 0 6px currentColor; }
+  .pips i.h { background: currentColor; opacity: .45; }
+  .wrow { display: grid; grid-template-columns: 62px 64px 1fr; align-items: center; gap: 12px; padding: 10px 0; }
+  .wrow .lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+  .wrow .v { font-size: 22px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+  .wrow .v small { display: block; font-size: 10px; font-weight: 600; margin-top: 3px; letter-spacing: 0; }
+  .chips { display: flex; gap: 6px; overflow: hidden; }
+  .chip { font-size: 12px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--hair); color: var(--ink-2); white-space: nowrap; }
+  .chip.on { background: rgba(255,255,255,.16); color: var(--ink); font-weight: 600; border-color: transparent; }
+  .bignum { font-size: 44px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+  .bignum small { font-size: 14px; font-weight: 500; color: var(--ink-2); margin-left: 4px; letter-spacing: 0; }
+  .chart { width: 100%; height: 120px; display: block; }
+  .chart path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .chart .area { fill: currentColor; opacity: .12; stroke: none; }
+  .chart .base { stroke: rgba(255,255,255,.28); stroke-dasharray: 3 4; stroke-width: 1; }
+  .chart .band { fill: rgba(255,255,255,.06); }
+  .chart .end { fill: currentColor; }
+  .spark .end { fill: currentColor; }
+  .axis { display: flex; justify-content: space-between; font-size: 10px; color: var(--ink-3); margin-top: 4px; }
+  .readout { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+  .readout .k { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .readout .v { font-size: 15px; font-weight: 700; margin-top: 2px; letter-spacing: -.01em; }
+  .hyp1 { display: flex; gap: 1px; height: 26px; border-radius: 6px; overflow: hidden; }
+  .hyp1 i { display: block; height: 100%; }
+  .hyp1 .a { background: var(--sleep-1); }
+  .hyp1 .l { background: var(--sleep-2); }
+  .hyp1 .r { background: var(--sleep-2); background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.35) 0 2px, transparent 2px 5px); }
+  .hyp1 .d { background: var(--sleep-3); }
+  .blk { width: 100%; height: 118px; display: block; }
+  .blk rect { rx: 3; }
+  .blk .a { fill: var(--sleep-1); } .blk .r { fill: var(--sleep-2); } .blk .l { fill: var(--sleep-2); opacity: .7; } .blk .d { fill: var(--sleep-3); }
+  .blk .lbl { font-size: 9px; fill: var(--ink-3); letter-spacing: .06em; }
+  .blk .link { stroke: rgba(255,255,255,.18); stroke-width: 1; }
+  .stagechips { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+  .stagechips div { padding: 9px 8px; text-align: center; }
+  .stagechips .k { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+  .stagechips .v { font-size: 15px; font-weight: 700; margin-top: 3px; letter-spacing: -.01em; }
+  .stagechips .p { font-size: 10px; color: var(--ink-3); }
+  .heat { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; }
+  .heat i { aspect-ratio: 1; border-radius: 2px; display: block; }
+  .insight { padding: 14px 16px; display: grid; grid-template-columns: 34px 1fr 14px; gap: 12px; align-items: center; }
+  .insight .ic { width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; font-size: 16px; background: rgba(255,255,255,.08); }
+  .insight .h { font-size: 15px; font-weight: 600; }
+  .insight .b { font-size: 12px; color: var(--ink-2); margin-top: 2px; line-height: 1.4; }
+  .insight .spark { height: 22px; margin-top: 6px; }
+  .sect { display: flex; align-items: baseline; justify-content: space-between; margin-top: 22px; margin-bottom: 8px; }
+  .sect .overline { color: var(--ink-2); }
+  .sect .r { font-size: 11px; color: var(--ink-3); }
+  .linkrow { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; }
+  .linkrow .n { font-size: 14px; font-weight: 600; }
+  .linkrow .s { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .picks { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0 0; }
+  .picks .glass { padding: 20px 22px; border-radius: 20px; }
+  .picks h3 { margin: 0 0 6px; font-size: 18px; }
+  .picks p { color: var(--ink-2); font-size: 14px; line-height: 1.55; margin: 0 0 8px; }
+  .picks .why { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mint); margin-top: 10px; }
+  table.map { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 12px; }
+  table.map th, table.map td { text-align: left; padding: 9px 10px; border-top: 1px solid var(--hair); vertical-align: top; }
+  table.map th { color: var(--ink-3); font-weight: 600; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+  table.map td:first-child { color: var(--ink); font-weight: 600; }
+  .before { display: flex; gap: 14px; flex-wrap: wrap; margin: 12px 0 0; }
+  .before figure { margin: 0; width: 150px; }
+  .before img { width: 150px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.5); opacity: .85; }
+  .before figcaption { font-size: 11px; color: var(--ink-3); margin-top: 6px; }
+  @media (max-width: 900px) { .picks { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Kineva — Trends &amp; Sleep concepts</h1>
+  <p class="lede">Three directions for each of the Trends and Sleep tabs. Same brief on both: the tab itself carries a lean amount of data (one screen, no scrolling through nine cards) and every row is a door into a deeper page. Same Liquid Glass material and drifting colour field as the Halo home page, so the three tabs read as one app. All numbers are test data for one wearer on Sunday 7 September.</p>
+  <p class="meta">Score hues are the app's own tokens (Charge green, Effort amber, Rest violet, mint accent). Sleep depth is a single-hue ramp with hatching for REM so it survives colour-vision deficiency. References were pulled from Mobbin and are linked under each concept. The two picks each come with their first drill-down page mocked beside them.</p>
+  <div class="toc">
+    <a href="#t1">T1 · Pulse</a><a href="#t2">T2 · Lens</a><a href="#t3">T3 · Story</a>
+    <a href="#s1">S1 · Night</a><a href="#s2">S2 · Ledger</a><a href="#s3">S3 · Stages</a>
+    <a href="#picks">Picks</a><a href="#map">Drill-down map</a>
+    <a class="toggle" id="toggle" href="#" onclick="document.body.classList.toggle('expanded');this.textContent=document.body.classList.contains('expanded')?'Phone view':'Show full pages';return false;">Show full pages</a>
+  </div>
+
+  <section style="padding:0 0 40px;color:var(--ink-2);font-size:14px;line-height:1.6;">
+    <h2 style="color:var(--ink);font-size:20px;margin:0 0 6px">What is there today</h2>
+    <p style="margin:0;max-width:760px">Trends stacks a week digest, a range bar, four full-height charts, a year calendar and an export card: three screens tall. Sleep stacks a Rest gauge, sleep marks, the stage chart, naps, seven metric tiles, the debt ledger, stages vs typical and a 30-day trend: five screens tall. Both tabs show everything at once and nothing opens into anything.</p>
+    <div class="before">
+      <figure><img src="before/trends-1.png"><figcaption>Trends, top</figcaption></figure>
+      <figure><img src="before/trends-2.png"><figcaption>Trends, charts</figcaption></figure>
+      <figure><img src="before/trends-3.png"><figcaption>Trends, calendar + export</figcaption></figure>
+      <figure><img src="before/sleep-1.png"><figcaption>Sleep, gauge + marks</figcaption></figure>
+      <figure><img src="before/sleep-2.png"><figcaption>Sleep, stages + naps</figcaption></figure>
+      <figure><img src="before/sleep-3.png"><figcaption>Sleep, tiles + ledger</figcaption></figure>
+      <figure><img src="before/sleep-4.png"><figcaption>Sleep, vs typical + trend</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- =========================== T1 · PULSE =========================== -->
+  <section class="concept pair" id="t1">
+    <div class="phone" data-tab="trends">
+      <div class="bg" style="background: radial-gradient(120% 80% at 50% -10%, #10261f 0%, #0f1014 60%);">
+        <div class="blob" style="width:300px;height:300px;left:-90px;top:-40px;background:#03e095;opacity:.4;"></div>
+        <div class="blob" style="width:260px;height:260px;right:-80px;top:200px;background:#5bc8e8;opacity:.3;animation-delay:-6s;"></div>
+        <div class="blob" style="width:280px;height:280px;left:80px;bottom:-120px;background:#8e6fd6;opacity:.3;animation-delay:-11s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-title">Trends</div><div class="h-sub">The thread of you over time.</div></div>
+          <div class="row gap6"><div class="glass pill iconbtn" title="Export report">⇪</div><div class="glass pill iconbtn" title="Calendar">▦</div></div>
+        </div>
+
+        <div class="glass mt18" style="padding:14px 16px 10px;">
+          <div class="row between"><span class="overline">This week · vs last week</span><span class="row gap6" style="font-size:12px;color:var(--mint)"><span>‹</span><span class="muted">Mon 1 – Sun 7</span><span class="muted">›</span></span></div>
+          <div class="wrow mt10" style="color:var(--charge)"><span class="lbl">Charge</span><span class="v" style="color:var(--ink)">71<small class="delta-up">▲ 6</small></span><div class="pips"><i class="f"></i><i class="f"></i><i class="h"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="h"></i></div></div>
+          <div class="wrow" style="color:var(--effort);border-top:1px solid rgba(255,255,255,.08)"><span class="lbl">Effort</span><span class="v" style="color:var(--ink)">12.1<small class="delta-flat">▼ 0.8</small></span><div class="pips"><i class="f"></i><i class="h"></i><i class="f"></i><i class="f"></i><i class="h"></i><i class="f"></i><i></i></div></div>
+          <div class="wrow" style="color:var(--rest);border-top:1px solid rgba(255,255,255,.08)"><span class="lbl">Rest</span><span class="v" style="color:var(--ink)">84<small class="delta-up">▲ 3</small></span><div class="pips"><i class="f"></i><i class="f"></i><i class="f"></i><i class="h"></i><i class="f"></i><i class="f"></i><i class="f"></i></div></div>
+          <div class="row between mt10" style="font-size:11px;color:var(--ink-3)"><span>A pip per day, filled when the day's score beat its baseline</span><span class="chev">›</span></div>
+        </div>
+
+        <div class="sect"><span class="overline">Signals</span><span class="r">vs 30-day baseline</span></div>
+        <div class="glass" style="padding:2px 0;">
+          <div class="mrow" style="color:var(--cyan)"><div><div class="n">HRV</div><div class="d delta-up">▲ 4 ms vs 58</div></div><div class="v" style="color:var(--ink)">62<small>ms</small></div><svg class="spark" viewBox="0 0 76 26" data-v="55,57,54,58,56,60,59,61,58,62,60,63,62" data-base="58"></svg><span class="chev">›</span></div>
+          <div class="mrow" style="color:var(--rose)"><div><div class="n">Resting HR</div><div class="d delta-up">▼ 2 bpm vs 51</div></div><div class="v" style="color:var(--ink)">49<small>bpm</small></div><svg class="spark" viewBox="0 0 76 26" data-v="52,51,53,51,50,52,50,49,51,50,49,50,49" data-base="51"></svg><span class="chev">›</span></div>
+          <div class="mrow" style="color:var(--rest)"><div><div class="n">Sleep</div><div class="d delta-down">▼ 18 min vs need</div></div><div class="v" style="color:var(--ink)">7<small>h</small>12<small>m</small></div><svg class="spark" viewBox="0 0 76 26" data-v="7.5,6.9,7.8,7.1,6.4,7.9,7.3,7.0,7.6,7.2,6.8,7.4,7.2" data-base="7.5"></svg><span class="chev">›</span></div>
+          <div class="mrow" style="color:var(--sleep-2)"><div><div class="n">Breathing</div><div class="d delta-flat">on baseline</div></div><div class="v" style="color:var(--ink)">14.2<small>rpm</small></div><svg class="spark" viewBox="0 0 76 26" data-v="14.1,14.3,14.2,14.4,14.1,14.2,14.3,14.1,14.2,14.2,14.3,14.1,14.2" data-base="14.2"></svg><span class="chev">›</span></div>
+        </div>
+
+        <div class="sect"><span class="overline">Charge calendar</span><span class="r">past 16 weeks</span></div>
+        <div class="glass" style="padding:14px 16px;">
+          <div class="heat" data-seed="7"></div>
+          <div class="row between mt10" style="font-size:11px;color:var(--ink-3)"><span>Depleted <span style="display:inline-block;width:60px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--rose),var(--amber),var(--charge));vertical-align:middle;margin:0 4px"></span> Peaked</span><span class="chev">›</span></div>
+        </div>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+
+    <div class="phone second" data-tab="trends">
+      <div class="cap">Drill-down · HRV</div>
+      <div class="bg" style="background: radial-gradient(120% 80% at 50% -10%, #10262a 0%, #0f1014 60%);">
+        <div class="blob" style="width:300px;height:300px;left:-90px;top:-40px;background:#5bc8e8;opacity:.35;"></div>
+        <div class="blob" style="width:260px;height:260px;right:-80px;top:260px;background:#03e095;opacity:.22;animation-delay:-6s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="navbar"><span class="back">‹ Trends</span><span>HRV</span><span class="act">ⓘ</span></div>
+        <div class="glass pill seg mt14"><span>W</span><span>M</span><span class="on">3M</span><span>6M</span><span>1Y</span><span>ALL</span></div>
+        <div class="mt18" style="color:var(--cyan)">
+          <div class="row between" style="align-items:flex-end"><div><div class="bignum" style="color:var(--ink)">62<small>ms</small></div><div class="delta-up mt10" style="font-size:13px;font-weight:600">▲ 4 vs 30-day baseline 58</div></div><div class="badge">89 readings · 3 months</div></div>
+          <svg class="chart mt14" viewBox="0 0 330 120" preserveAspectRatio="none" data-v="55,60,52,58,63,57,61,66,54,59,64,58,62,68,60,57,63,65,59,62,66,61,64,60,63,67,62,65,61,62" data-base="58" data-band="53,63"></svg>
+          <div class="axis"><span>Jun 8</span><span>Jul 6</span><span>Aug 3</span><span>Aug 31</span></div>
+        </div>
+        <div class="glass mt14" style="padding:12px 16px;">
+          <div class="readout"><div><div class="k">Mean</div><div class="v">61 ms</div></div><div><div class="k">Min</div><div class="v">46</div></div><div><div class="k">Max</div><div class="v">103</div></div><div><div class="k">Trend</div><div class="v delta-up">▲ 5</div></div></div>
+        </div>
+        <div class="sect"><span class="overline">Moves with</span><span class="r">same 3 months</span></div>
+        <div class="g2">
+          <div class="glass tile" style="color:var(--rose)"><div class="lbl">Resting HR</div><div class="val" style="color:var(--ink)">49<small>bpm</small></div><div class="sub delta-up">▼ 2 · r = −0.61</div><svg class="spark mt10" viewBox="0 0 100 34" data-v="52,51,53,51,50,52,50,49,51,50,49,50,49"></svg></div>
+          <div class="glass tile" style="color:var(--charge)"><div class="lbl">Charge</div><div class="val" style="color:var(--ink)">71</div><div class="sub delta-up">▲ 6 · r = 0.74</div><svg class="spark mt10" viewBox="0 0 100 34" data-v="60,64,58,66,70,62,68,74,64,71,76,70,73"></svg></div>
+        </div>
+        <div class="glass deep mt14" style="padding:14px 16px;font-size:13px;line-height:1.5;color:var(--ink-2)">
+          <b style="color:var(--ink)">What moves it.</b> Your HRV runs highest after nights with more than 1h 40m of deep sleep and drops for two days after any session above 14 effort. Alcohol in the journal lines up with your four lowest readings.
+        </div>
+        <div class="glass linkrow mt10"><div><div class="n">Explore in the metric lab</div><div class="s">Overlay any two series, tags, correlations</div></div><span class="chev">›</span></div>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <span class="tag">Trends · Concept 1 · Pick</span>
+      <h2>Pulse — the week, then four signals</h2>
+      <p>One screen. The week digest becomes a three-row card: each score's weekly average, its delta against last week, and a pip per day. Below it, four signal rows carry a value, one signed delta against the 30-day baseline and a sparkline. The year calendar shrinks to a 16-week strip. Every row opens the metric page on the right: range control, one big chart with the baseline band, a readout strip, the two metrics it moves with, and a plain-English "what moves it".</p>
+      <h3>What leaves the tab</h3>
+      <ul>
+        <li>Four full-height charts become four rows. The chart lives one tap in, with the range control.</li>
+        <li>The range bar moves into the metric page. The tab has one fixed window (week vs week, 30-day baseline).</li>
+        <li>Export becomes a nav icon. The year calendar becomes a strip that opens the full heat map.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/cf175d8e-0c46-4461-90cb-3c5163d9349a">Bevel — metric rows with value, range verdict and sparkline</a>
+        <a href="https://mobbin.com/screens/ac062be6-8111-4a22-b58d-6636b448f976">Oura — metric page with range control and tags</a>
+        <a href="https://mobbin.com/screens/d66bfd32-f311-4414-b0a7-8f9bebc2eddf">Apple Health — every row is a door</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== T2 · LENS =========================== -->
+  <section class="concept" id="t2">
+    <div class="phone" data-tab="trends">
+      <div class="bg" style="background: radial-gradient(120% 80% at 50% -10%, #0f2a22 0%, #0f1014 60%);">
+        <div class="blob" style="width:320px;height:320px;left:-100px;top:-80px;background:#03e095;opacity:.42;"></div>
+        <div class="blob" style="width:240px;height:240px;right:-70px;top:300px;background:#2f6fcb;opacity:.3;animation-delay:-8s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-title">Trends</div><div class="h-sub">One signal at a time.</div></div>
+          <div class="glass pill iconbtn">⇪</div>
+        </div>
+        <div class="chips mt14"><span class="chip on">Charge</span><span class="chip">HRV</span><span class="chip">Resting HR</span><span class="chip">Effort</span><span class="chip">Rest</span></div>
+
+        <div class="glass tint-charge mt14" style="padding:16px 16px 12px;color:var(--charge)">
+          <div class="row between" style="align-items:flex-end"><div><div class="overline">Charge · 3 months</div><div class="bignum mt10" style="color:var(--ink)">71<small>avg</small></div><div class="delta-up" style="font-size:13px;font-weight:600;margin-top:6px">▲ 6 vs previous 3 months</div></div><span class="chev" style="font-size:20px">›</span></div>
+          <svg class="chart mt14" viewBox="0 0 330 120" preserveAspectRatio="none" data-v="60,64,58,66,70,62,68,74,64,71,76,70,73,66,69,78,72,68,75,80,74,70,77,72,69,76,81,74,73,71" data-base="65"></svg>
+          <div class="axis"><span>Jun 8</span><span>Jul 6</span><span>Aug 3</span><span>Aug 31</span></div>
+          <div class="readout mt14" style="color:var(--ink)"><div><div class="k">Mean</div><div class="v">71</div></div><div><div class="k">Peak</div><div class="v">93</div></div><div><div class="k">Low</div><div class="v">19</div></div><div><div class="k">Days</div><div class="v">89</div></div></div>
+          <div class="glass pill seg mt14" style="color:var(--ink)"><span>W</span><span>M</span><span class="on">3M</span><span>6M</span><span>1Y</span><span>ALL</span></div>
+        </div>
+
+        <div class="sect"><span class="overline">Also this quarter</span><span class="r">tap to switch</span></div>
+        <div class="g2">
+          <div class="glass tile" style="color:var(--cyan)"><div class="lbl">HRV</div><div class="val" style="color:var(--ink)">62<small>ms</small></div><div class="sub delta-up">▲ 4 vs baseline</div><svg class="spark mt10" viewBox="0 0 100 34" data-v="55,57,54,58,56,60,59,61,58,62,60,63,62"></svg></div>
+          <div class="glass tile" style="color:var(--rose)"><div class="lbl">Resting HR</div><div class="val" style="color:var(--ink)">49<small>bpm</small></div><div class="sub delta-up">▼ 2 vs baseline</div><svg class="spark mt10" viewBox="0 0 100 34" data-v="52,51,53,51,50,52,50,49,51,50,49,50,49"></svg></div>
+          <div class="glass tile" style="color:var(--effort)"><div class="lbl">Effort</div><div class="val" style="color:var(--ink)">12.1</div><div class="sub delta-flat">▼ 0.8 vs last week</div><svg class="spark mt10" viewBox="0 0 100 34" data-v="9,14,6,12,15,8,13,11,7,14,12,10,12"></svg></div>
+          <div class="glass tile" style="color:var(--rest)"><div class="lbl">Rest</div><div class="val" style="color:var(--ink)">84</div><div class="sub delta-up">▲ 3 vs last week</div><svg class="spark mt10" viewBox="0 0 100 34" data-v="80,86,78,88,82,90,84,79,87,85,83,88,84"></svg></div>
+        </div>
+        <div class="glass linkrow mt14"><div><div class="n">Week in review</div><div class="s">Charge · Effort · Rest, Mon 1 – Sun 7</div></div><span class="chev">›</span></div>
+        <div class="glass linkrow mt10"><div><div class="n">Charge calendar</div><div class="s">Past year, a square per day</div></div><span class="chev">›</span></div>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+    <div class="notes">
+      <span class="tag">Trends · Concept 2</span>
+      <h2>Lens — one big chart you retarget</h2>
+      <p>The tab is a single hero chart with a chip row above it. Tapping a chip or one of the four tiles swaps what the hero shows, so the range control and the readout strip live on the tab and never move. The week digest and the calendar become plain link rows at the bottom. The chart itself is the door to the full metric page.</p>
+      <h3>What leaves the tab</h3>
+      <ul>
+        <li>Four stacked charts become one, with the other four as thumbnail tiles.</li>
+        <li>The week digest becomes a link row. Its trio of pips lives on its own page.</li>
+        <li>The calendar becomes a link row. Export stays as a nav icon.</li>
+      </ul>
+      <h3>Trade-off</h3>
+      <ul>
+        <li>Fastest way to study one signal, but comparisons need a chip change each time. Effort and Rest hide behind a tap on a morning where you want the week at a glance.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/13a1535a-f9b0-4e73-8b08-b4ded7ec9f78">Oura — one titled chart with a compact range toggle</a>
+        <a href="https://mobbin.com/screens/ad161af2-69f4-4c28-b620-f7e291bbf23d">Oura — day/week/month/year with a big number over the plot</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== T3 · STORY =========================== -->
+  <section class="concept" id="t3">
+    <div class="phone" data-tab="trends">
+      <div class="bg" style="background: radial-gradient(120% 80% at 50% -10%, #1b1f2e 0%, #0f1014 60%);">
+        <div class="blob" style="width:300px;height:300px;left:-70px;top:-60px;background:#5bc8e8;opacity:.32;"></div>
+        <div class="blob" style="width:280px;height:280px;right:-90px;top:240px;background:#8e6fd6;opacity:.34;animation-delay:-5s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-title">Trends</div><div class="h-sub">What changed in the last two weeks.</div></div>
+          <div class="glass pill iconbtn">⇪</div>
+        </div>
+
+        <div class="glass insight mt18" style="color:var(--cyan)"><div class="ic">〰</div><div><div class="h">HRV is climbing</div><div class="b">Up 6% over 14 days, now 62 ms. Your best fortnight since June.</div><svg class="spark" viewBox="0 0 100 22" data-v="55,57,54,58,56,60,59,61,58,62,60,63,62"></svg></div><span class="chev">›</span></div>
+        <div class="glass insight mt10" style="color:var(--rose)"><div class="ic">♥</div><div><div class="h">Resting HR up three nights running</div><div class="b">49 → 52 bpm since Thursday. Two hard sessions and a short Friday night.</div><svg class="spark" viewBox="0 0 100 22" data-v="50,49,49,50,49,50,52,52"></svg></div><span class="chev">›</span></div>
+        <div class="glass insight mt10" style="color:var(--rest)"><div class="ic">☾</div><div><div class="h">Sleep debt cleared on Tuesday</div><div class="b">Now 1h 10m ahead of need across 14 nights.</div><svg class="spark" viewBox="0 0 100 22" data-v="-90,-70,-60,-40,-20,10,30,45,50,60,70" data-base="0"></svg></div><span class="chev">›</span></div>
+
+        <div class="sect"><span class="overline">This week</span><span class="r">vs last week</span></div>
+        <div class="glass" style="padding:14px 16px;">
+          <div class="g3" style="gap:6px;">
+            <div class="ring" style="color:var(--charge)"><svg width="88" height="88" viewBox="0 0 88 88"><circle class="track" cx="44" cy="44" r="37" fill="none" stroke-width="7"/><circle class="arc" cx="44" cy="44" r="37" fill="none" stroke="currentColor" stroke-width="7" stroke-dasharray="232.5" stroke-dashoffset="67"/></svg><div class="v"><div class="big" style="font-size:22px">71</div><div class="lbl">Charge</div></div></div>
+            <div class="ring" style="color:var(--effort)"><svg width="88" height="88" viewBox="0 0 88 88"><circle class="track" cx="44" cy="44" r="37" fill="none" stroke-width="7"/><circle class="arc" cx="44" cy="44" r="37" fill="none" stroke="currentColor" stroke-width="7" stroke-dasharray="232.5" stroke-dashoffset="92"/></svg><div class="v"><div class="big" style="font-size:22px">12.1</div><div class="lbl">Effort</div></div></div>
+            <div class="ring" style="color:var(--rest)"><svg width="88" height="88" viewBox="0 0 88 88"><circle class="track" cx="44" cy="44" r="37" fill="none" stroke-width="7"/><circle class="arc" cx="44" cy="44" r="37" fill="none" stroke="currentColor" stroke-width="7" stroke-dasharray="232.5" stroke-dashoffset="37"/></svg><div class="v"><div class="big" style="font-size:22px">84</div><div class="lbl">Rest</div></div></div>
+          </div>
+          <div class="g3 mt10" style="gap:6px;text-align:center;font-size:11px"><span class="delta-up">▲ 6</span><span class="delta-flat">▼ 0.8</span><span class="delta-up">▲ 3</span></div>
+        </div>
+
+        <div class="sect"><span class="overline">Browse by metric</span></div>
+        <div class="glass" style="padding:2px 0;">
+          <div class="mrow compact"><div class="n">HRV</div><div class="v" style="font-size:14px">62 ms <span class="delta-up" style="font-size:11px">▲ 4</span></div><span class="chev">›</span></div>
+          <div class="mrow compact"><div class="n">Resting HR</div><div class="v" style="font-size:14px">49 bpm <span class="delta-up" style="font-size:11px">▼ 2</span></div><span class="chev">›</span></div>
+          <div class="mrow compact"><div class="n">Sleep</div><div class="v" style="font-size:14px">7h 12m <span class="delta-down" style="font-size:11px">▼ 18m</span></div><span class="chev">›</span></div>
+          <div class="mrow compact"><div class="n">Effort</div><div class="v" style="font-size:14px">12.1 <span class="delta-flat" style="font-size:11px">▼ 0.8</span></div><span class="chev">›</span></div>
+          <div class="mrow compact"><div class="n">Charge calendar</div><div class="v muted" style="font-size:12px;font-weight:500">past year</div><span class="chev">›</span></div>
+        </div>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+    <div class="notes">
+      <span class="tag">Trends · Concept 3</span>
+      <h2>Story — what changed, then the numbers</h2>
+      <p>The tab opens with up to three generated findings, each a sentence with a sparkline: a signal that moved, how much, and since when. Tapping one opens the metric page with that window already selected. The week trio sits under it as small rings, and every metric is still reachable through a compact list at the bottom.</p>
+      <h3>What leaves the tab</h3>
+      <ul>
+        <li>All charts. The tab shows sentences and sparklines only.</li>
+        <li>The range bar and the calendar. Both live one tap in.</li>
+      </ul>
+      <h3>Trade-off</h3>
+      <ul>
+        <li>Only as good as the finding rules. The app already has an insights engine, but a quiet fortnight produces an empty hero, and a bad finding reads as the app being wrong. Needs a "nothing notable" state that still looks intentional.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/6400621a-b4e1-4eab-8acd-f085433a3d73">Oura — resilience: a verdict, then contributors with chevrons</a>
+        <a href="https://mobbin.com/screens/5398d721-0769-4b79-9143-52f1c87fe9ba">Noom — sentence under each metric title</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== S1 · NIGHT =========================== -->
+  <section class="concept pair" id="s1">
+    <div class="phone" data-tab="sleep">
+      <div class="bg" style="background: radial-gradient(120% 80% at 50% -10%, #1b1636 0%, #0f1014 60%);">
+        <div class="blob" style="width:320px;height:320px;left:-90px;top:-60px;background:#8e6fd6;opacity:.42;"></div>
+        <div class="blob" style="width:260px;height:260px;right:-90px;top:220px;background:#2f6fcb;opacity:.32;animation-delay:-6s;"></div>
+        <div class="blob" style="width:260px;height:260px;left:60px;bottom:-100px;background:#4f86d6;opacity:.24;animation-delay:-11s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-title">Sleep</div><div class="h-sub">Last night · Sat 6 → Sun 7</div></div>
+          <div class="row gap6"><div class="glass pill iconbtn">‹</div><div class="glass pill iconbtn" style="color:var(--ink-3)">›</div></div>
+        </div>
+
+        <div class="glass tint-rest mt18" style="padding:18px 16px 14px;">
+          <div class="row gap14">
+            <div class="ring" style="color:var(--rest)"><svg width="112" height="112" viewBox="0 0 112 112"><circle class="track" cx="56" cy="56" r="48" fill="none" stroke-width="10"/><circle class="arc" cx="56" cy="56" r="48" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="301.6" stroke-dashoffset="39"/></svg><div class="v"><div class="big" style="font-size:32px">87</div><div class="lbl">Rest</div></div></div>
+            <div class="col gap6" style="flex:1">
+              <div><div class="num" style="font-size:26px">7<small style="font-size:13px;font-weight:500;color:var(--ink-2)">h</small> 39<small style="font-size:13px;font-weight:500;color:var(--ink-2)">m</small></div><div class="sec" style="font-size:12px">asleep · 16 min short of need</div></div>
+              <div class="sec" style="font-size:12px">10:40 PM → 6:33 AM</div>
+              <div class="row gap6" style="font-size:11px;color:var(--ink-3)"><span>Optimal</span><span>·</span><span>97% efficient</span></div>
+            </div>
+          </div>
+          <div class="hyp1 mt14"><i class="a" style="flex:1"></i><i class="l" style="flex:7"></i><i class="d" style="flex:5"></i><i class="l" style="flex:5"></i><i class="r" style="flex:4"></i><i class="l" style="flex:6"></i><i class="d" style="flex:4"></i><i class="l" style="flex:5"></i><i class="r" style="flex:6"></i><i class="l" style="flex:3"></i><i class="r" style="flex:2"></i><i class="a" style="flex:1"></i></div>
+          <div class="row between mt10" style="font-size:10px;color:var(--ink-2)"><span class="legend"><span><span class="sw" style="background:var(--sleep-1)"></span>Awake 3%</span><span><span class="sw" style="background:var(--sleep-2)"></span>Light 64%</span><span><span class="sw" style="background:var(--sleep-2);background-image:repeating-linear-gradient(135deg,rgba(0,0,0,.4) 0 1px,transparent 1px 3px)"></span>REM 17%</span><span><span class="sw" style="background:var(--sleep-3)"></span>Deep 16%</span></span><span class="chev">›</span></div>
+        </div>
+
+        <div class="sect"><span class="overline">Contributors</span><span class="r">vs your typical</span></div>
+        <div class="glass" style="padding:2px 0;">
+          <div class="crow" style="color:var(--rest)"><div><div class="n">Duration</div><div class="bar"><i style="width:96%"></i></div></div><div class="verdict" style="color:var(--ink)">7h 39m<small class="delta-down">▼ 16m vs need</small></div><span class="chev">›</span></div>
+          <div class="crow" style="color:var(--charge)"><div><div class="n">Efficiency</div><div class="bar"><i style="width:97%"></i></div></div><div class="verdict" style="color:var(--ink)">97%<small>optimal</small></div><span class="chev">›</span></div>
+          <div class="crow" style="color:var(--charge)"><div><div class="n">Consistency</div><div class="bar"><i style="width:85%"></i></div></div><div class="verdict" style="color:var(--ink)">85%<small class="delta-up">▲ 5 vs typical</small></div><span class="chev">›</span></div>
+          <div class="crow" style="color:var(--effort)"><div><div class="n">Restorative</div><div class="bar"><i style="width:34%"></i></div></div><div class="verdict" style="color:var(--ink)">34%<small class="delta-down">▼ 9 vs typical</small></div><span class="chev">›</span></div>
+          <div class="crow" style="color:var(--sleep-2)"><div><div class="n">Breathing</div><div class="bar"><i style="width:60%"></i></div></div><div class="verdict" style="color:var(--ink)">14.2 rpm<small>in range</small></div><span class="chev">›</span></div>
+          <div class="crow" style="color:var(--charge)"><div><div class="n">Sleep debt</div><div class="bar"><i style="width:70%"></i></div></div><div class="verdict" style="color:var(--ink)">1h 10m<small class="delta-up">ahead of need</small></div><span class="chev">›</span></div>
+        </div>
+
+        <div class="glass linkrow mt14"><div><div class="n">Log</div><div class="s">Naps, going-to-sleep and awake marks, edit wake time</div></div><span class="chev">›</span></div>
+        <div class="glass linkrow mt10" style="color:var(--rest)"><div><div class="n" style="color:var(--ink)">30 nights</div><div class="s">7.3 h avg · 5.8 – 8.3</div></div><div class="row gap10"><svg class="spark" style="width:90px;height:26px" viewBox="0 0 90 26" data-v="7.5,6.9,7.8,7.1,6.4,7.9,7.3,7.0,7.6,7.2,6.8,7.4,7.6,7.1,7.65"></svg><span class="chev">›</span></div></div>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+
+    <div class="phone second" data-tab="sleep">
+      <div class="cap">Drill-down · Stages</div>
+      <div class="bg" style="background: radial-gradient(120% 80% at 50% -10%, #1b1636 0%, #0f1014 60%);">
+        <div class="blob" style="width:320px;height:320px;left:-90px;top:-60px;background:#8e6fd6;opacity:.36;"></div>
+        <div class="blob" style="width:260px;height:260px;right:-90px;top:300px;background:#2f6fcb;opacity:.28;animation-delay:-6s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="navbar"><span class="back">‹ Sleep</span><span>Stages</span><span class="act">Edit</span></div>
+        <div class="glass mt14" style="padding:14px 16px 12px;">
+          <div class="row between"><span class="overline">Last night</span><span class="badge">7h 54m in bed · 97%</span></div>
+          <svg class="blk mt10" viewBox="0 0 330 118" data-hyp="a:0,4;l:4,20;d:20,31;l:31,42;r:42,52;l:52,66;d:66,75;l:75,86;r:86,96;l:96,99;a:99,100"></svg>
+          <div class="axis"><span>10:40 PM</span><span>2:36 AM</span><span>6:33 AM</span></div>
+          <div class="stagechips mt14">
+            <div class="glass" style="border-radius:14px;color:var(--sleep-2)"><div class="k">REM</div><div class="v" style="color:var(--ink)">1h 20m</div><div class="p">17% · <span class="delta-down">▼ 21m</span></div></div>
+            <div class="glass" style="border-radius:14px;color:var(--sleep-3)"><div class="k">Deep</div><div class="v" style="color:var(--ink)">1h 16m</div><div class="p">16% · <span class="delta-down">▼ 12m</span></div></div>
+            <div class="glass" style="border-radius:14px;color:var(--sleep-2)"><div class="k">Light</div><div class="v" style="color:var(--ink)">5h 3m</div><div class="p">64% · <span class="delta-up">▲ 56m</span></div></div>
+            <div class="glass" style="border-radius:14px;color:var(--sleep-1)"><div class="k">Awake</div><div class="v" style="color:var(--ink)">14m</div><div class="p">3%</div></div>
+          </div>
+          <div class="row mt10" style="font-size:11px;color:var(--ink-3)">Deltas are against your 30-night typical. Stages are approximate, computed on-device.</div>
+        </div>
+        <div class="glass mt10" style="padding:14px 16px;">
+          <div class="row between"><span class="overline">Partly recorded</span><span class="badge" style="border-color:var(--amber);color:var(--amber)">89%</span></div>
+          <div class="sec mt10" style="font-size:12px;line-height:1.45">Only 89% of the night's window has stage data. The totals cover that part of the night.</div>
+        </div>
+        <div class="sect"><span class="overline">Why this is your main sleep</span></div>
+        <div class="glass deep" style="padding:14px 16px;font-size:13px;line-height:1.5;color:var(--ink-2)">The longest block that overlaps your habitual midsleep (3:10 AM). A 22-minute block at 2:15 PM was kept as a nap.</div>
+        <div class="sect"><span class="overline">Daytime sleep</span><span class="r" style="color:var(--mint)">＋ Add nap</span></div>
+        <div class="glass linkrow"><div><div class="n">Nap · 2:15 – 2:37 PM</div><div class="s">22 min · counted toward need</div></div><span class="chev">›</span></div>
+        <div class="glass linkrow mt10"><div><div class="n">Motion</div><div class="s">No movement detail for this night</div></div><span class="chev muted">›</span></div>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <span class="tag">Sleep · Concept 1 · Pick</span>
+      <h2>Night — score, hours and a one-line hypnogram, then contributors</h2>
+      <p>The hero is one slab: the Rest ring, hours asleep against need, bed and wake times, and the night compressed to a single-row hypnogram with its legend. Below it the seven metric tiles become six contributor rows in the Oura pattern: name, a bar, the value and one delta or verdict. The ledger, naps, marks and the 30-night trend become two link rows. Tapping the hero opens the stages page on the right, which is the current stage card, naps and the "why this is your main sleep" explainer, unchanged in data.</p>
+      <h3>What leaves the tab</h3>
+      <ul>
+        <li>The Rest gauge and the stage chart merge into one hero. The block hypnogram and stage rows move to the stages page.</li>
+        <li>Seven tiles with sparklines become six rows with one number each. The sparkline and typical band move to each contributor's page.</li>
+        <li>Sleep marks, naps, the wake editor and the "main sleep" explainer move under Log and Stages.</li>
+        <li>The debt ledger and the 30-day trend become link rows carrying just the headline figure.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/ded88fa6-85b6-460f-89b9-9eb71fcd2ef9">Oura — sleep score, then a contributors list with chevrons</a>
+        <a href="https://mobbin.com/screens/5d156e6a-f1ba-4b4f-8360-31122d692ee4">Bevel — ring beside time in bed / time asleep, contributors as bars</a>
+        <a href="https://mobbin.com/screens/f91de068-fb36-4d69-a8d0-5c5b77404fb0">WHOOP — stage rows against a typical range</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== S2 · LEDGER =========================== -->
+  <section class="concept" id="s2">
+    <div class="phone" data-tab="sleep">
+      <div class="bg" style="background: radial-gradient(120% 80% at 50% -10%, #17162e 0%, #0f1014 60%);">
+        <div class="blob" style="width:300px;height:300px;left:-80px;top:-60px;background:#8e6fd6;opacity:.38;"></div>
+        <div class="blob" style="width:260px;height:260px;right:-90px;top:280px;background:#03e095;opacity:.22;animation-delay:-7s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-title">Sleep</div><div class="h-sub">Where you stand against your need.</div></div>
+          <div class="glass pill iconbtn">＋</div>
+        </div>
+
+        <div class="glass mt18" style="padding:16px 16px 12px;color:var(--charge)">
+          <div class="row between"><span class="overline">Sleep balance · 14 nights</span><span class="badge" style="border-color:var(--charge);color:var(--charge)">on target</span></div>
+          <div class="bignum mt10" style="color:var(--ink)">1<small>h</small> 10<small>m</small> <span style="font-size:18px;font-weight:600;color:var(--charge)">ahead</span></div>
+          <div class="sec" style="font-size:12px;margin-top:4px">Slept minus your 7h 55m need, summed. Cleared last Tuesday.</div>
+          <svg class="chart mt14" style="height:72px" viewBox="0 0 330 72" preserveAspectRatio="none" data-bars="-40,-25,10,35,-15,20,45,30,-10,25,40,-20,15,-16" data-base="0"></svg>
+          <div class="axis"><span>Aug 24</span><span>Aug 31</span><span>Sep 6</span></div>
+          <div class="row between mt10" style="font-size:11px;color:var(--ink-3)"><span>Green nights beat need, amber fell short</span><span class="chev">›</span></div>
+        </div>
+
+        <div class="sect"><span class="overline">Last night</span><span class="r">Sat 6 → Sun 7</span></div>
+        <div class="glass tint-rest" style="padding:14px 16px;">
+          <div class="row gap14">
+            <div class="ring" style="color:var(--rest)"><svg width="72" height="72" viewBox="0 0 72 72"><circle class="track" cx="36" cy="36" r="30" fill="none" stroke-width="7"/><circle class="arc" cx="36" cy="36" r="30" fill="none" stroke="currentColor" stroke-width="7" stroke-dasharray="188.5" stroke-dashoffset="24.5"/></svg><div class="v"><div class="big" style="font-size:20px">87</div></div></div>
+            <div style="flex:1"><div class="num" style="font-size:20px">7h 39m <span class="sec" style="font-size:12px;font-weight:500">asleep</span></div><div class="sec" style="font-size:12px">10:40 PM → 6:33 AM · 97% efficient</div><div class="hyp1 mt10" style="height:14px"><i class="a" style="flex:1"></i><i class="l" style="flex:7"></i><i class="d" style="flex:5"></i><i class="l" style="flex:5"></i><i class="r" style="flex:4"></i><i class="l" style="flex:6"></i><i class="d" style="flex:4"></i><i class="l" style="flex:5"></i><i class="r" style="flex:6"></i><i class="l" style="flex:3"></i><i class="r" style="flex:2"></i><i class="a" style="flex:1"></i></div></div>
+            <span class="chev">›</span>
+          </div>
+        </div>
+
+        <div class="sect"><span class="overline">Night detail</span><span class="r">vs typical</span></div>
+        <div class="g3" style="gap:8px">
+          <div class="glass tile" style="padding:12px 10px;color:var(--charge)"><div class="lbl">Efficiency</div><div class="val" style="font-size:18px;color:var(--ink)">97<small>%</small></div><div class="sub delta-up">▲ 2</div></div>
+          <div class="glass tile" style="padding:12px 10px;color:var(--charge)"><div class="lbl">Consistency</div><div class="val" style="font-size:18px;color:var(--ink)">85<small>%</small></div><div class="sub delta-up">▲ 5</div></div>
+          <div class="glass tile" style="padding:12px 10px;color:var(--effort)"><div class="lbl">Restorative</div><div class="val" style="font-size:18px;color:var(--ink)">34<small>%</small></div><div class="sub delta-down">▼ 9</div></div>
+          <div class="glass tile" style="padding:12px 10px;color:var(--sleep-2)"><div class="lbl">Breathing</div><div class="val" style="font-size:18px;color:var(--ink)">14.2</div><div class="sub delta-flat">in range</div></div>
+          <div class="glass tile" style="padding:12px 10px;color:var(--rest)"><div class="lbl">In bed</div><div class="val" style="font-size:18px;color:var(--ink)">7<small>h</small>54</div><div class="sub sec">14m awake</div></div>
+          <div class="glass tile" style="padding:12px 10px;color:var(--rest)"><div class="lbl">Woke</div><div class="val" style="font-size:18px;color:var(--ink)">6:33</div><div class="sub sec">typical 6:50</div></div>
+        </div>
+        <div class="glass linkrow mt14"><div><div class="n">Log</div><div class="s">Naps, sleep marks, edit wake time</div></div><span class="chev">›</span></div>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+    <div class="notes">
+      <span class="tag">Sleep · Concept 2</span>
+      <h2>Ledger — the balance first, last night second</h2>
+      <p>The running balance against need becomes the hero: one figure, a verdict, fourteen diverging bars. Last night is a compact card under it with the ring, the hours and a thin hypnogram; tapping it opens the full night. The six detail metrics become small tiles with a single delta each, and everything editable sits under Log.</p>
+      <h3>What leaves the tab</h3>
+      <ul>
+        <li>The stage chart, the stage rows, "stages vs typical", naps, marks and the 30-day trend all move behind the last-night card.</li>
+        <li>Tile sparklines go. Each tile keeps one number and one delta.</li>
+      </ul>
+      <h3>Trade-off</h3>
+      <ul>
+        <li>The balance is the most decision-useful number on the tab, but most mornings people open Sleep to see last night. Leading with a 14-night sum answers a question they asked less often.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/c487780d-cae7-4399-8505-23713e3fe2a8">Bevel — sleep bank as a debt figure with its own trend</a>
+        <a href="https://mobbin.com/screens/690bc0dd-48c5-4d95-8337-ca094006ca55">Garmin — duration vs need over a week</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== S3 · STAGES =========================== -->
+  <section class="concept" id="s3">
+    <div class="phone" data-tab="sleep">
+      <div class="bg" style="background: radial-gradient(120% 80% at 50% -10%, #12183a 0%, #0f1014 60%);">
+        <div class="blob" style="width:320px;height:320px;left:-100px;top:-70px;background:#4f86d6;opacity:.38;"></div>
+        <div class="blob" style="width:260px;height:260px;right:-80px;top:260px;background:#8e6fd6;opacity:.32;animation-delay:-6s;"></div>
+        <div class="grain"></div>
+      </div>
+      <div class="island"></div>
+      <div class="status"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+      <div class="scroll">
+        <div class="row between">
+          <div><div class="h-title">Sleep</div><div class="h-sub">Sat 6 → Sun 7 · 10:40 PM – 6:33 AM</div></div>
+          <div class="row gap6"><div class="glass pill iconbtn">‹</div><div class="glass pill iconbtn" style="color:var(--ink-3)">›</div></div>
+        </div>
+
+        <div class="g2 mt18">
+          <div class="glass tile tint-rest" style="color:var(--rest)"><div class="lbl">Rest</div><div class="val" style="font-size:30px;color:var(--ink)">87</div><div class="sub sec">Optimal · <span class="delta-up">▲ 4 vs yesterday</span></div></div>
+          <div class="glass tile" style="color:var(--rest)"><div class="lbl">Asleep</div><div class="val" style="font-size:30px;color:var(--ink)">7<small>h</small>39<small>m</small></div><div class="sub sec"><span class="delta-down">▼ 16m</span> vs 7h 55m need</div></div>
+        </div>
+
+        <div class="glass mt10" style="padding:14px 16px 12px;">
+          <div class="row between"><span class="overline">Stages</span><span class="badge">97% efficient</span></div>
+          <svg class="blk mt10" viewBox="0 0 330 118" data-hyp="a:0,4;l:4,20;d:20,31;l:31,42;r:42,52;l:52,66;d:66,75;l:75,86;r:86,96;l:96,99;a:99,100"></svg>
+          <div class="axis"><span>10:40 PM</span><span>2:36 AM</span><span>6:33 AM</span></div>
+          <div class="stagechips mt14">
+            <div class="glass" style="border-radius:14px;color:var(--sleep-2)"><div class="k">REM</div><div class="v" style="color:var(--ink)">1h 20m</div><div class="p">17%</div></div>
+            <div class="glass" style="border-radius:14px;color:var(--sleep-3)"><div class="k">Deep</div><div class="v" style="color:var(--ink)">1h 16m</div><div class="p">16%</div></div>
+            <div class="glass" style="border-radius:14px;color:var(--sleep-2)"><div class="k">Light</div><div class="v" style="color:var(--ink)">5h 3m</div><div class="p">64%</div></div>
+            <div class="glass" style="border-radius:14px;color:var(--sleep-1)"><div class="k">Awake</div><div class="v" style="color:var(--ink)">14m</div><div class="p">3%</div></div>
+          </div>
+          <div class="row between mt10" style="font-size:11px;color:var(--ink-3)"><span>Naps, marks and "why this is your main sleep"</span><span class="chev">›</span></div>
+        </div>
+
+        <div class="sect"><span class="overline">vs your typical</span><span class="r">30 nights</span></div>
+        <div class="glass" style="padding:2px 0;">
+          <div class="crow" style="color:var(--sleep-3)"><div><div class="n">Deep</div><div class="bar"><i style="width:82%"></i></div></div><div class="verdict delta-down">▼ 12m</div><span class="chev">›</span></div>
+          <div class="crow" style="color:var(--sleep-2)"><div><div class="n">REM</div><div class="bar"><i style="width:74%"></i></div></div><div class="verdict delta-down">▼ 21m</div><span class="chev">›</span></div>
+          <div class="crow" style="color:var(--sleep-2)"><div><div class="n">Light</div><div class="bar"><i style="width:100%"></i></div></div><div class="verdict delta-up">▲ 56m</div><span class="chev">›</span></div>
+        </div>
+
+        <div class="glass linkrow mt14" style="color:var(--rest)"><div><div class="n" style="color:var(--ink)">30 nights</div><div class="s">7.3 h avg · debt 1h 10m ahead</div></div><div class="row gap10"><svg class="spark" style="width:90px;height:26px" viewBox="0 0 90 26" data-v="7.5,6.9,7.8,7.1,6.4,7.9,7.3,7.0,7.6,7.2,6.8,7.4,7.6,7.1,7.65"></svg><span class="chev">›</span></div></div>
+        <div class="glass linkrow mt10"><div><div class="n">More</div><div class="s">Efficiency, consistency, restorative, breathing</div></div><span class="chev">›</span></div>
+        <div style="height:24px"></div>
+      </div>
+    </div>
+    <div class="notes">
+      <span class="tag">Sleep · Concept 3</span>
+      <h2>Stages — the hypnogram is the page</h2>
+      <p>Closest to today, condensed. Two numbers up top (Rest and hours against need), then the block hypnogram at full width with the four stage totals as chips, then three "vs typical" rows for Deep, REM and Light. The 30-night trend and the remaining four metrics collapse into two link rows.</p>
+      <h3>What leaves the tab</h3>
+      <ul>
+        <li>The Rest gauge becomes a tile. Naps, marks and the main-sleep explainer move behind the stage card.</li>
+        <li>Efficiency, consistency, restorative and breathing move to a "More" page. The ledger becomes a phrase on the trend row.</li>
+      </ul>
+      <h3>Trade-off</h3>
+      <ul>
+        <li>Keeps the chart people recognise, but the hypnogram is the least decision-useful thing on the page: WHOOP 4.0 stages are approximate and the chart is the same shape most nights. It spends the hero on the least trustworthy signal.</li>
+      </ul>
+      <h3>References</h3>
+      <div class="refs">
+        <a href="https://mobbin.com/screens/0828975c-fa85-4cfb-a9ff-2c22d99d79af">Ultrahuman — stage list over a full-width hypnogram</a>
+        <a href="https://mobbin.com/screens/88396821-5f55-46d9-8c1e-fc4bc91be47b">The Outsiders — stage table with an optimal range</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== PICKS =========================== -->
+  <section id="picks" style="padding:48px 0 0;border-top:1px solid var(--hair);color:var(--ink-2);font-size:14px;line-height:1.6;">
+    <h2 style="color:var(--ink);font-size:24px;margin:0 0 6px">Picks</h2>
+    <p style="margin:0;max-width:760px">Both picks follow the Halo rule already on the home page: one number and one signed delta per row, colour only ever beside a label, and every row a door.</p>
+    <div class="picks">
+      <div class="glass">
+        <h3>Trends → T1 · Pulse</h3>
+        <p>Answers the two questions the tab exists for, in order: how was this week against last week, and which signal is off its baseline. Lens is better for studying one metric, but that is what the drill-down page is for; Story depends on finding rules that will be quiet most fortnights.</p>
+        <p>Cheapest to build of the three: the week digest, the four resolves, the year strip and the metric explorer all exist. Pulse rearranges them and adds a baseline delta per row.</p>
+        <div class="why">Why not the others</div>
+        <p>Lens hides Effort and Rest behind a chip. Story needs a "nothing notable" state that is not an empty hero.</p>
+      </div>
+      <div class="glass">
+        <h3>Sleep → S1 · Night</h3>
+        <p>Leads with what people open the tab for, last night, and shows it in one slab instead of two heroes. The contributor list is the proven pattern (Oura, Bevel) for "lean, then dig": six rows, one figure each, and the sparkline and typical band waiting one tap in.</p>
+        <p>The ledger keeps its headline figure as a row, so the balance is still on the tab without owning it. The stages page is the current stage card, naps and explainer moved as-is, so nothing analytical is lost or re-derived.</p>
+        <div class="why">Why not the others</div>
+        <p>Ledger leads with a 14-night sum on a morning when the question is last night. Stages spends the hero on the least trustworthy signal a WHOOP 4.0 produces.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== DRILL-DOWN MAP =========================== -->
+  <section id="map" style="padding:48px 0 0;color:var(--ink-2);font-size:14px;line-height:1.6;">
+    <h2 style="color:var(--ink);font-size:20px;margin:0 0 6px">Drill-down map for the picks</h2>
+    <p style="margin:0;max-width:760px">What stays on the tab, what moves where. Every destination on the right already exists as a view or a card; the work is routing and a lighter row component.</p>
+    <table class="map">
+      <tr><th>Today</th><th>On the tab (Pulse)</th><th>One tap in</th></tr>
+      <tr><td>Week in review card</td><td>Three rows: avg, delta vs last week, 7 pips</td><td>Week digest page with ‹ › and the full pip trio</td></tr>
+      <tr><td>Range bar</td><td>Gone. Fixed 30-day baseline on the tab</td><td>Metric page, W/M/3M/6M/1Y/ALL</td></tr>
+      <tr><td>Charge / HRV / RHR / Effort charts</td><td>Four signal rows: value, one delta, sparkline</td><td>Metric explorer (exists) with baseline band, readout, related metrics, "what moves it"</td></tr>
+      <tr><td>Charge calendar</td><td>16-week strip</td><td>Full year heat map</td></tr>
+      <tr><td>Export report card</td><td>Nav icon</td><td>Report sheet (exists)</td></tr>
+      <tr><th>Today</th><th>On the tab (Night)</th><th>One tap in</th></tr>
+      <tr><td>Rest gauge hero + stage chart hero</td><td>One slab: ring, hours vs need, times, single-row hypnogram</td><td>Stages page: block hypnogram, stage chips with deltas, partly-recorded note, main-sleep explainer, naps, motion</td></tr>
+      <tr><td>Seven metric tiles with sparklines</td><td>Six contributor rows: bar, value, one delta or verdict</td><td>Per-contributor page: 30-night chart, typical band, what it means</td></tr>
+      <tr><td>Sleep-debt ledger card</td><td>The "Sleep debt" contributor row</td><td>Ledger page: 14 diverging bars and the running balance</td></tr>
+      <tr><td>Stages vs typical card</td><td>Folded into the stage chips' deltas</td><td>Stages page</td></tr>
+      <tr><td>Sleep marks, naps, wake editor</td><td>One "Log" row</td><td>Log page: marks, add nap, edit wake time</td></tr>
+      <tr><td>30-day asleep trend</td><td>One row with avg and a sparkline</td><td>Duration page, same as the contributor</td></tr>
+    </table>
+    <p style="margin-top:18px;max-width:760px"><a href="../">← Home screen concepts</a> · <a href="../halo-build/">Halo build screenshots</a> · <a href="../activity/">Unlogged-activity flow</a></p>
+  </section>
+</div>
+
+<template id="tabbar">
+  <div class="tabbar glass">
+    <div class="tab" data-t="today"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Today</div>
+    <div class="tab" data-t="trends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>Trends</div>
+    <div class="tab" data-t="sleep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18V9a2 2 0 012-2h14a2 2 0 012 2v9M3 13h18"/></svg>Sleep</div>
+    <div class="tab" data-t="workouts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M7 8v8M17 8v8"/></svg>Workouts</div>
+    <div class="tab" data-t="more"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>More</div>
+  </div>
+  <div class="home-ind"></div>
+</template>
+
+<script>
+(function () {
+  // Tab bars: one template, active tab from data-tab.
+  var tpl = document.getElementById('tabbar');
+  document.querySelectorAll('.phone').forEach(function (ph) {
+    var n = tpl.content.cloneNode(true);
+    n.querySelectorAll('.tab').forEach(function (t) { if (t.dataset.t === ph.dataset.tab) t.classList.add('on'); });
+    ph.appendChild(n);
+  });
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  // Lines: data-v = comma list, data-base = dashed baseline, data-band = "lo,hi" shaded band.
+  document.querySelectorAll('svg[data-v]').forEach(function (svg) {
+    var v = svg.dataset.v.split(',').map(Number);
+    var vb = svg.getAttribute('viewBox').split(' ').map(Number), W = vb[2], H = vb[3];
+    var pad = 3, lo = Math.min.apply(null, v), hi = Math.max.apply(null, v);
+    if (svg.dataset.base) { lo = Math.min(lo, +svg.dataset.base); hi = Math.max(hi, +svg.dataset.base); }
+    if (svg.dataset.band) { var b = svg.dataset.band.split(',').map(Number); lo = Math.min(lo, b[0]); hi = Math.max(hi, b[1]); }
+    if (hi === lo) { hi = lo + 1; }
+    var y = function (val) { return pad + (H - 2 * pad) * (1 - (val - lo) / (hi - lo)); };
+    var x = function (i) { return pad + (W - 2 * pad) * i / (v.length - 1); };
+    if (svg.dataset.band) {
+      var bb = svg.dataset.band.split(',').map(Number);
+      svg.appendChild(el('rect', { class: 'band', x: 0, y: y(bb[1]), width: W, height: y(bb[0]) - y(bb[1]) }));
+    }
+    var d = v.map(function (val, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(val).toFixed(1); }).join(' ');
+    svg.appendChild(el('path', { class: 'area', d: d + ' V' + H + ' H0 Z' }));
+    if (svg.dataset.base) { var by = y(+svg.dataset.base); svg.appendChild(el('path', { class: 'base', d: 'M0 ' + by.toFixed(1) + ' H' + W })); }
+    svg.appendChild(el('path', { d: d, stroke: 'currentColor' }));
+    svg.appendChild(el('circle', { class: 'end', cx: x(v.length - 1), cy: y(v[v.length - 1]), r: svg.classList.contains('chart') ? 3.5 : 2.2 }));
+  });
+
+  // Diverging bars: data-bars, positive up (green) negative down (amber).
+  document.querySelectorAll('svg[data-bars]').forEach(function (svg) {
+    var v = svg.dataset.bars.split(',').map(Number);
+    var vb = svg.getAttribute('viewBox').split(' ').map(Number), W = vb[2], H = vb[3];
+    var m = Math.max.apply(null, v.map(Math.abs)), mid = H / 2, gap = 4, bw = (W - gap * (v.length - 1)) / v.length;
+    svg.appendChild(el('path', { class: 'base', d: 'M0 ' + mid + ' H' + W }));
+    v.forEach(function (val, i) {
+      var h = Math.abs(val) / m * (mid - 4);
+      svg.appendChild(el('rect', { x: i * (bw + gap), y: val >= 0 ? mid - h : mid, width: bw, height: h, rx: 2, fill: val >= 0 ? '#03e095' : '#f0a85a', opacity: .9 }));
+    });
+  });
+
+  // Block hypnogram: data-hyp = "stage:from,to;…" in percent of the night, 4 rows.
+  var rows = { a: 0, r: 1, l: 2, d: 3 }, names = ['AWAKE', 'REM', 'LIGHT', 'DEEP'];
+  document.querySelectorAll('svg[data-hyp]').forEach(function (svg) {
+    var vb = svg.getAttribute('viewBox').split(' ').map(Number), W = vb[2], H = vb[3];
+    var left = 40, rh = H / 4, bh = 14, segs = svg.dataset.hyp.split(';').map(function (s) { var p = s.split(':'), q = p[1].split(',').map(Number); return { s: p[0], a: q[0], b: q[1] }; });
+    names.forEach(function (n, i) { var t = el('text', { class: 'lbl', x: 0, y: rh * i + rh / 2 + 3 }); t.textContent = n; svg.appendChild(t); });
+    var X = function (p) { return left + (W - left) * p / 100; };
+    segs.forEach(function (sg, i) {
+      var y = rh * rows[sg.s] + rh / 2 - bh / 2;
+      svg.appendChild(el('rect', { class: sg.s, x: X(sg.a), y: y, width: Math.max(2, X(sg.b) - X(sg.a)), height: bh }));
+      if (i) { var pv = segs[i - 1]; svg.appendChild(el('path', { class: 'link', d: 'M' + X(sg.a) + ' ' + (rh * rows[pv.s] + rh / 2) + ' V' + (rh * rows[sg.s] + rh / 2) })); }
+    });
+  });
+
+  // Charge heat strip: 16 weeks x 7 days, deterministic pseudo-random.
+  document.querySelectorAll('.heat').forEach(function (g) {
+    var seed = +g.dataset.seed || 1, cols = 16;
+    var rnd = function () { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    var cells = [];
+    for (var d = 0; d < 7; d++) for (var w = 0; w < cols; w++) cells.push({ d: d, w: w, v: 0.35 + rnd() * 0.6 });
+    cells.sort(function (a, b) { return a.d - b.d || a.w - b.w; });
+    cells.forEach(function (c) {
+      var i = document.createElement('i');
+      var col = c.v > .66 ? 'var(--charge)' : c.v > .5 ? 'var(--amber)' : c.v > .4 ? 'var(--effort)' : 'var(--rose)';
+      i.style.background = col; i.style.opacity = (0.3 + c.v * 0.45).toFixed(2);
+      g.appendChild(i);
+    });
+  });
+})();
+</script>
+</body>
+</html>
